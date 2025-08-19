@@ -1,3 +1,4 @@
+import { pollCommits } from "@/lib/github";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { z } from "zod";
 
@@ -21,10 +22,12 @@ export const projectRouter = createTRPCRouter({
                 }
             }
         });
+        // call pollCommits every time we create a project async is used to wait for the pollCommits to finish
+        await pollCommits(project.id);
         return project;
     }),
     getProjects: protectedProcedure.query(async ({ctx}) => {
-        const projects = await ctx.db.project.findMany({
+        return await ctx.db.project.findMany({
             where: {
                 userToProjects: {
                     some: {
@@ -34,6 +37,16 @@ export const projectRouter = createTRPCRouter({
                 deletedAt: null
             }
         })
-        return projects;
-    })
+        
+    }),
+    // get commits for a project from the database
+    getCommits: protectedProcedure.input(
+  z.object({
+    projectId: z.string(),
+  })
+).query(async ({ ctx, input }) => {
+    // check for new commits from github
+ pollCommits(input.projectId).then().catch(console.error);
+  return await ctx.db.commit.findMany({where: { projectId: input.projectId },})
+})
 });

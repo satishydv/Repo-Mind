@@ -13,14 +13,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "next/navigation";
 import { askQuestion } from "./action";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import Image from "next/image";
 import useProject from "@/hooks/use-project";
+import Modal from "@/components/Modal";
 
 const AskQuestionCard = () => {
   const { project } = useProject();
@@ -36,6 +31,7 @@ const AskQuestionCard = () => {
     setLoading(true);
     setOpen(true);
     setAnswer(''); // Reset answer
+    setFilesReferences([]); // Reset file references
 
     try {
       const { output, filesReferences } = await askQuestion(question, project.id);
@@ -57,20 +53,32 @@ const AskQuestionCard = () => {
 
   return (
     <>
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              <Image src="/logo.png" alt="dionysus" width={40} height={40} />
-            </DialogTitle>
-          </DialogHeader>
-          <div className="whitespace-pre-wrap">{answer}</div>
-          <h1>Files References</h1>
-          {filesReferences.map(file => {
-            return <span key={file.fileName}>{file.fileName}</span>
-          })}
-        </DialogContent>
-      </Dialog>
+      <Modal open={open} setOpen={setOpen}>
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <Image src="/logo.png" alt="dionysus" width={40} height={40} />
+            <h2 className="text-xl font-semibold">Dionysus's Answer</h2>
+          </div>
+          
+          <div className="prose max-w-none">
+            <div className="whitespace-pre-wrap text-sm leading-relaxed">{answer}</div>
+          </div>
+          
+          {filesReferences.length > 0 && (
+            <div className="mt-6">
+              <h3 className="text-lg font-semibold mb-2">Files Referenced:</h3>
+              <div className="flex flex-wrap gap-2">
+                {filesReferences.map(file => (
+                  <span key={file.fileName} className="px-2 py-1 bg-gray-100 rounded text-xs">
+                    {file.fileName}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </Modal>
+      
       <Card className="relative w-full">
         <CardHeader>
           <CardTitle>Ask a question</CardTitle>

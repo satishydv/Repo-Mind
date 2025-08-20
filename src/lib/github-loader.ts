@@ -18,33 +18,61 @@ export const loadGithubRepo = async (githubUrl: string, githubToken?: string) =>
 }
 
 export const indexGithubRepo = async (projectId: string, githubUrl: string, githubToken?: string) => {
-  const docs = await loadGithubRepo(githubUrl, githubToken)
-  const allEmbeddings = await generateEmbeddings(docs)
+  console.log('Starting indexGithubRepo for project:', projectId, 'URL:', githubUrl)
   
-  await Promise.allSettled(allEmbeddings.map(async (embedding, index) => {
-    console.log(`processing ${index} of ${allEmbeddings.length}`)
-    if (!embedding) return
+  try {
+    // Test database connection
+    console.log('Testing database connection...')
+    await db.$queryRaw`SELECT 1`
+    console.log('Database connection successful')
     
-    const sourceCodeEmbedding = await db.sourceCodeEmbedding.create({
-      data: {
-        summary: embedding.summary,
-        sourceCode: embedding.sourceCode,
-        fileName: embedding.fileName,
-        projectId,
+    const docs = await loadGithubRepo(githubUrl, githubToken)
+    console.log('Loaded', docs.length, 'documents from GitHub')
+    
+    const allEmbeddings = await generateEmbeddings(docs)
+    console.log('Generated embeddings for', allEmbeddings.filter(Boolean).length, 'files')
+    
+    await Promise.allSettled(allEmbeddings.map(async (embedding, index) => {
+      console.log(`Processing ${index} of ${allEmbeddings.length}`)
+      if (!embedding) {
+        console.log('Skipping null embedding at index', index)
+        return
       }
-    })
+      
+      try {
+        const sourceCodeEmbedding = await db.sourceCodeEmbedding.create({
+          data: {
+            summary: embedding.summary,
+            sourceCode: embedding.sourceCode,
+            fileName: embedding.fileName,
+            projectId,
+          }
+        })
+        
+        console.log('Created embedding record for:', embedding.fileName)
+        
+        await db.$executeRaw`
+          UPDATE "SourceCodeEmbedding"
+          SET "summaryEmbedding" = ${`[${embedding.embedding.join(',')}]`}::vector
+          WHERE "id"= ${sourceCodeEmbedding.id}
+        `
+        
+        console.log('Updated vector for:', embedding.fileName)
+      } catch (error) {
+        console.error('Error saving embedding for', embedding.fileName, ':', error)
+      }
+    }))
     
-    await db.$executeRaw`
-      UPDATE "SourceCodeEmbedding"
-      SET "summaryEmbedding" = ${`[${embedding.embedding.join(',')}]`}::vector
-      WHERE "id"= ${sourceCodeEmbedding.id}
-    `
-  }))
-  
-  return allEmbeddings
+    console.log('Finished indexing project:', projectId)
+    return allEmbeddings
+  } catch (error) {
+    console.error('Error in indexGithubRepo:', error)
+    throw error
+  }
 }
 
 const generateEmbeddings = async (docs: Document[]) => {
+  console.log('Starting generateEmbeddings for', docs.length, 'documents')
   const results = []
   
   for (let i = 0; i < docs.length; i++) {
@@ -52,8 +80,13 @@ const generateEmbeddings = async (docs: Document[]) => {
     console.log(`Processing file ${i + 1} of ${docs.length}: ${doc.metadata.source}`)
     
     try {
+      console.log('Generating summary for:', doc.metadata.source)
       const summary = await summariseCode(doc)
+      console.log('Summary generated for:', doc.metadata.source, 'Length:', summary.length)
+      
+      console.log('Generating embedding for:', doc.metadata.source)
       const embedding = await generateEmbedding(summary)
+      console.log('Embedding generated for:', doc.metadata.source, 'Vector size:', embedding.length)
       
       results.push({
         summary,
@@ -62,8 +95,11 @@ const generateEmbeddings = async (docs: Document[]) => {
         fileName: doc.metadata.source,
       })
       
+      console.log('Successfully processed:', doc.metadata.source)
+      
       // Add delay to respect rate limits (4 seconds between requests = 15 requests per minute)
       if (i < docs.length - 1) {
+        console.log('Waiting 4 seconds before next file...')
         await new Promise(resolve => setTimeout(resolve, 4000))
       }
     } catch (error) {
@@ -73,6 +109,7 @@ const generateEmbeddings = async (docs: Document[]) => {
     }
   }
   
+  console.log('Finished generateEmbeddings. Successfully processed:', results.filter(Boolean).length, 'files')
   return results
 }
 

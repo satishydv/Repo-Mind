@@ -1,4 +1,5 @@
 import { pollCommits } from "@/lib/github";
+import { indexGithubRepo } from "@/lib/github-loader";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { z } from "zod";
 
@@ -22,6 +23,7 @@ export const projectRouter = createTRPCRouter({
                 }
             }
         });
+        await indexGithubRepo(project.id, input.githubUrl, input.githubToken);
         // call pollCommits every time we create a project async is used to wait for the pollCommits to finish
         await pollCommits(project.id);
         return project;
@@ -36,8 +38,7 @@ export const projectRouter = createTRPCRouter({
                 },
                 deletedAt: null
             }
-        })
-        
+        });
     }),
     // get commits for a project from the database
     getCommits: protectedProcedure.input(

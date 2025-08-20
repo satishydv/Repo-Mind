@@ -8,6 +8,12 @@ import React from 'react'
 const Commit = () => {
   const { projectId, project} = useProject()
   const { data: commits } = api.project.getCommits.useQuery({ projectId })
+  
+  // Don't render if project is not available
+  if (!project) {
+    return null
+  }
+  
   return (
     <>  
     <ul className='space-y-6'>

@@ -5,10 +5,21 @@ import useProject from '@/hooks/use-project'
 import { ExternalLink, Github } from 'lucide-react'
 import Link from 'next/link'
 import Commit from './commit'
+import AskQuestionCard from '@/app/(protected)/dashboard/ask-question-card'
 
 
 const DashboardPage = () => {
   const { project } = useProject()
+  
+  // Don't render if project is not available
+  if (!project) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <p className="text-gray-500">No project selected</p>
+      </div>
+    )
+  }
+  
   return (
     <div>
       {project?.id}
@@ -27,18 +38,12 @@ const DashboardPage = () => {
           </div>
         </div>
 
-        <div className='h-4'></div>
-        <div className='flex items-center gap-4'>
-          TeamMember  
-          InviteButton 
-          ArchiveButton
-        </div>
+        
       </div>
 
       <div className='mt-4'>
-        <div className='grid grid-cols-1 gap-4 sm:grid-cols-5'>
-             AskQuestion
-          MettingCard
+        <div className='w-full'>
+         <AskQuestionCard />
         </div>
       </div>
 

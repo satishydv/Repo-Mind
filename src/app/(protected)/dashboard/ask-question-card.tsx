@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "next/navigation";
 import { askQuestion } from "./action";
+import { Brain, Sparkles, Code2 } from "lucide-react";
 import Image from "next/image";
 import useProject from "@/hooks/use-project";
 import Modal from "@/components/Modal";
@@ -54,31 +55,45 @@ const AskQuestionCard = () => {
   return (
     <>
       <Modal open={open} setOpen={setOpen}>
-        <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <Image src="/logo.png" alt="dionysus" width={40} height={40} />
-            <h2 className="text-xl font-semibold">Dionysus's Answer</h2>
+        <div className="space-y-8">
+          <div className="flex items-center gap-4">
+            <div className="p-2.5 bg-primary/20 rounded-xl border border-primary/30 shadow-sm">
+              <Brain className="size-6 text-primary" />
+            </div>
+            <div className="flex flex-col">
+              <h2 className="text-2xl font-bold tracking-tight">AI Assistant Response</h2>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground font-medium">
+                <Sparkles className="size-3.5" />
+                <span>Powered by Dionysus Intelligence</span>
+              </div>
+            </div>
           </div>
-          
-          <div className="prose max-w-none">
-            <div className="whitespace-pre-wrap text-sm leading-relaxed">{answer}</div>
+
+          <div className="prose prose-slate dark:prose-invert max-w-none">
+            <div className="whitespace-pre-wrap text-base md:text-lg leading-relaxed text-foreground/90 font-medium">
+              {answer || (loading && <div className="animate-pulse flex space-x-2"><div className="h-4 bg-primary/20 rounded w-full"></div></div>)}
+            </div>
           </div>
-          
+
           {filesReferences.length > 0 && (
-            <div className="mt-6">
-              <h3 className="text-lg font-semibold mb-2">Files Referenced:</h3>
+            <div className="pt-6 border-t border-white/10 space-y-4">
+              <div className="flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-muted-foreground/80">
+                <Code2 className="size-4" />
+                <span>Source Context</span>
+              </div>
               <div className="flex flex-wrap gap-2">
                 {filesReferences.map(file => (
-                  <span key={file.fileName} className="px-2 py-1 bg-gray-100 rounded text-xs">
+                  <div key={file.fileName} className="flex items-center gap-2 px-3 py-1.5 bg-primary/5 hover:bg-primary/10 border border-primary/10 rounded-lg text-xs font-semibold text-primary transition-colors cursor-default">
+                    <span className="opacity-60">📁</span>
                     {file.fileName}
-                  </span>
+                  </div>
                 ))}
               </div>
             </div>
           )}
         </div>
       </Modal>
-      
+
       <Card className="relative w-full">
         <CardHeader>
           <CardTitle>Ask a question</CardTitle>

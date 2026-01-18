@@ -7,24 +7,35 @@ type Props = {
     children: React.ReactNode
 }
 
-const SidebarLayout = ({children}: Props) => {
-  return (
-   <SidebarProvider>
-    <AppSidebar/>
-    <main className="w-full m-2">
-        <div className='flex items-center border-sidebar-border border shadow rounded-md p-2'>
-            {/* <SearchBar /> */}
-            <div className='ml-auto'></div>
-            <UserButton/>
-        </div>
-        <div className='h-4'></div>
-        {/* main content */}
-        <div className='border-sidebar-border bg-sidebar border shadow rounded-md overflow-y-scroll h-[calc(100vh-6rem)] p-4'>
-            {children}
-        </div>
-    </main>
-   </SidebarProvider>
-  )
+const SidebarLayout = ({ children }: Props) => {
+    return (
+        <SidebarProvider>
+            <AppSidebar />
+            <main className="w-full flex-1 flex flex-col min-h-screen bg-gradient p-2 md:p-4 transition-all duration-300">
+                <div className='flex items-center glass rounded-xl px-6 py-3 mb-4 shadow-sm border-white/10'>
+                    <div className="flex items-center gap-2">
+                        <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Project Dashboard</span>
+                    </div>
+                    <div className='ml-auto flex items-center gap-4'>
+                        <UserButton
+                            appearance={{
+                                elements: {
+                                    userButtonAvatarBox: "size-9 border-2 border-primary/20 hover:border-primary/50 transition-all shadow-sm"
+                                }
+                            }}
+                        />
+                    </div>
+                </div>
+
+                {/* main content */}
+                <div className='flex-1 glass border-white/10 shadow-xl rounded-2xl overflow-hidden flex flex-col'>
+                    <div className="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar">
+                        {children}
+                    </div>
+                </div>
+            </main>
+        </SidebarProvider>
+    )
 }
 
 export default SidebarLayout

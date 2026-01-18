@@ -131,17 +131,17 @@ export function AppSidebar() {
                         )}
                       >
                         <div className={cn(
-                          "rounded-md border-2 size-7 flex items-center justify-center text-xs font-bold transition-colors",
+                          "rounded-xl size-8 flex items-center justify-center text-xs font-black transition-all shadow-sm",
                           project.id === projectId
-                            ? "bg-primary text-white border-primary shadow-sm"
-                            : "bg-background border-muted-foreground/20"
+                            ? "bg-linear-to-br from-primary to-purple-500 text-white shadow-primary/20"
+                            : "bg-linear-to-br from-pastel-blue to-pastel-purple text-primary/70 dark:text-white/70"
                         )}>
-                          <span>{project.name[0]}</span>
+                          <span>{project.name?.[0]?.toUpperCase()}</span>
                         </div>
-                        <span className="font-medium truncate">{project.name}</span>
-                        <div className='ml-auto'>
+                        <span className="font-bold tracking-tight truncate">{project.name}</span>
+                        <div className='ml-auto pl-2'>
                           <Trash2
-                            className='size-4 text-red-500 hover:text-red-700 transition-colors shrink-0'
+                            className='size-4 text-rose-500/50 hover:text-rose-500 transition-colors shrink-0'
                             onClick={(e) => {
                               e.stopPropagation()
                               const confirmed = window.confirm("Are you sure you want to delete this project?")

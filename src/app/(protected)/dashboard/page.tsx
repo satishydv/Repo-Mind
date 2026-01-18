@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 import { useUser } from '@clerk/nextjs'
 import React from 'react'
 import useProject from '@/hooks/use-project'
-import { ExternalLink, Github, Sparkles, Code2 } from 'lucide-react'
+import { ExternalLink, Github, Sparkles, Code2, Globe, Brain } from 'lucide-react'
 import Link from 'next/link'
 import Commit from './commit'
 import AskQuestionCard from '@/app/(protected)/dashboard/ask-question-card'
@@ -27,61 +27,94 @@ const DashboardPage = () => {
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-700">
+    <div className="mx-auto max-w-7xl space-y-8 animate-in fade-in zoom-in-95 duration-700">
       {/* Project Header Card */}
-      <div className="relative overflow-hidden rounded-2xl bg-primary px-8 py-10 text-white shadow-2xl shadow-primary/20">
-        <div className="absolute top-0 right-0 -mr-16 -mt-16 size-64 rounded-full bg-white/10 blur-3xl" />
-        <div className="absolute bottom-0 left-0 -ml-16 -mb-16 size-48 rounded-full bg-blue-400/20 blur-3xl" />
+      <div className="relative overflow-hidden rounded-[2.5rem] bg-mesh p-8 md:p-12 text-foreground shadow-2xl border border-white/20">
+        <div className="absolute top-0 right-0 -mr-16 -mt-16 size-96 rounded-full bg-pastel-pink/20 blur-[100px] animate-pulse" />
+        <div className="absolute bottom-0 left-0 -ml-16 -mb-16 size-64 rounded-full bg-pastel-blue/20 blur-[100px] animate-pulse delay-1000" />
 
-        <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2">
-            <div className="flex items-center gap-3">
-              <div className="p-2.5 bg-white/20 rounded-xl backdrop-blur-md border border-white/30">
-                <Github className="size-6 shadow-sm" />
+        <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-8">
+          <div className="space-y-4">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-white/40 dark:bg-white/10 rounded-2xl backdrop-blur-xl border border-white/40 shadow-xl shadow-primary/5">
+                <Github className="size-8 text-primary" />
               </div>
-              <h1 className="text-3xl font-extrabold tracking-tight">{project.name}</h1>
-            </div>
-            <div className="flex items-center gap-2 text-white/80 font-medium">
-              <span className="text-sm">Linked to:</span>
-              <Link
-                href={project.githubUrl}
-                target="_blank"
-                className="inline-flex items-center hover:text-white transition-colors group"
-              >
-                <code className="bg-black/20 px-2 py-0.5 rounded text-xs mr-1">{project.githubUrl}</code>
-                <ExternalLink className="size-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-              </Link>
+              <div>
+                <h1 className="text-4xl font-black tracking-tight leading-none mb-2">{project.name}</h1>
+                <div className="flex items-center gap-2 text-muted-foreground font-semibold">
+                  <Globe className="size-4" />
+                  <Link
+                    href={project.githubUrl}
+                    target="_blank"
+                    className="hover:text-primary transition-colors flex items-center gap-1 underline underline-offset-4 decoration-primary/30"
+                  >
+                    <span className="text-sm truncate max-w-[200px] md:max-w-md">{project.githubUrl}</span>
+                    <ExternalLink className="size-3" />
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <Button variant="secondary" className="bg-white/10 hover:bg-white/20 text-white border-white/20 backdrop-blur-md shadow-lg">
-              Project Statistics
+          <div className="flex flex-wrap items-center gap-3">
+            <Button variant="outline" className="rounded-2xl h-12 px-6 border-white/40 glass hover:bg-white/60 transition-all font-bold group">
+              <Sparkles className="size-4 mr-2 text-rose-500 group-hover:scale-110 transition-transform" />
+              Analyze Project
+            </Button>
+            <Button className="rounded-2xl h-12 px-6 bg-primary hover:bg-primary/90 text-white shadow-xl shadow-primary/20 font-bold transition-all hover:scale-105 active:scale-95">
+              Add Contributors
             </Button>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-8">
-        {/* AI Interaction Section */}
-        <section className="space-y-4">
-          <div className="flex items-center gap-2 px-1">
-            <Sparkles className="size-5 text-primary" />
-            <h2 className="text-xl font-bold tracking-tight">AI Code Assistant</h2>
+      {/* Quick Stats bar */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[
+          { label: 'Commits', value: '1,284', color: 'text-blue-500', bg: 'glass-blue' },
+          { label: 'Issues', value: '12', color: 'text-rose-500', bg: 'glass-pink' },
+          { label: 'Contributors', value: '8', color: 'text-emerald-500', bg: 'glass-emerald' },
+          { label: 'Files', value: '452', color: 'text-amber-500', bg: 'glass-amber' },
+        ].map((stat, i) => (
+          <div key={i} className={`p-4 rounded-3xl ${stat.bg} border-white/10 shadow-sm flex flex-col items-center justify-center gap-1 group hover:scale-[1.02] transition-all`}>
+            <span className="text-xs font-black uppercase tracking-widest text-muted-foreground/80">{stat.label}</span>
+            <span className={`text-2xl font-black ${stat.color} tabular-nums`}>{stat.value}</span>
           </div>
-          <div className="rounded-2xl border border-white/10 shadow-sm overflow-hidden bg-card/50 backdrop-blur-sm">
-            <AskQuestionCard />
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* AI Interaction Section */}
+        <section className="lg:col-span-7 space-y-4">
+          <div className="flex items-center justify-between px-2">
+            <div className="flex items-center gap-3">
+              <div className="size-10 rounded-xl bg-purple-500/10 flex items-center justify-center border border-purple-500/20">
+                <Brain className="size-5 text-purple-500" />
+              </div>
+              <h2 className="text-2xl font-black tracking-tight">AI Assistant</h2>
+            </div>
+          </div>
+          <div className="rounded-[2.5rem] p-1 glass-purple border-purple-500/10 shadow-2xl shadow-purple-500/5">
+            <div className="bg-card dark:bg-black/20 rounded-[2.25rem] overflow-hidden">
+              <AskQuestionCard />
+            </div>
           </div>
         </section>
 
         {/* Commit History Section */}
-        <section className="space-y-4">
-          <div className="flex items-center gap-2 px-1">
-            <Code2 className="size-5 text-primary" />
-            <h2 className="text-xl font-bold tracking-tight">Recent Activity</h2>
+        <section className="lg:col-span-5 space-y-4">
+          <div className="flex items-center justify-between px-2">
+            <div className="flex items-center gap-3">
+              <div className="size-10 rounded-xl bg-amber-500/10 flex items-center justify-center border border-amber-500/20">
+                <Code2 className="size-5 text-amber-500" />
+              </div>
+              <h2 className="text-2xl font-black tracking-tight">Recent Activity</h2>
+            </div>
           </div>
-          <div className="rounded-2xl border border-white/10 shadow-sm overflow-hidden bg-card/50 backdrop-blur-sm">
-            <Commit />
+          <div className="rounded-[2.5rem] p-1 glass-amber border-amber-500/10 shadow-2xl shadow-amber-500/5 h-full">
+            <div className="bg-card dark:bg-black/20 rounded-[2.25rem] p-6 h-[calc(100%-8px)] overflow-y-auto custom-scrollbar">
+              <Commit />
+            </div>
           </div>
         </section>
       </div>

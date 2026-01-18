@@ -17,6 +17,7 @@ import { Brain, Sparkles, Code2 } from "lucide-react";
 import Image from "next/image";
 import useProject from "@/hooks/use-project";
 import Modal from "@/components/Modal";
+import { readStreamableValue } from 'ai/rsc'
 
 const AskQuestionCard = () => {
   const { project } = useProject();
@@ -38,8 +39,8 @@ const AskQuestionCard = () => {
       const { output, filesReferences } = await askQuestion(question, project.id);
       setFilesReferences(filesReferences);
 
-      // Handle the text stream
-      for await (const delta of output) {
+      // Handle the text stream using readStreamableValue
+      for await (const delta of readStreamableValue(output)) {
         if (delta) {
           setAnswer(ans => ans + delta);
         }
@@ -94,22 +95,41 @@ const AskQuestionCard = () => {
         </div>
       </Modal>
 
-      <Card className="relative w-full">
-        <CardHeader>
-          <CardTitle>Ask a question</CardTitle>
-          <CardDescription>
-            Dionysus has knowledge of the codebase
+      <Card className="relative w-full border-none bg-transparent shadow-none">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-xl font-bold tracking-tight">Ask your codebase</CardTitle>
+          <CardDescription className="text-muted-foreground font-medium">
+            Search naturally for logic, files, or specific functionality.
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
           <form onSubmit={onSubmit}>
-            <Textarea
-              placeholder="Which file should I edit to change the home page?"
-              value={question}
-              onChange={(e) => setQuestion(e.target.value)}
-            />
-            <Button disabled={loading} className="mt-4">
-              {loading ? "Thinking..." : "Ask Dionysus!"}
+            <div className="relative group">
+              <Textarea
+                placeholder="Which file should I edit to change the home page?"
+                value={question}
+                onChange={(e) => setQuestion(e.target.value)}
+                className="min-h-[120px] rounded-2xl border-white/20 bg-white/50 dark:bg-white/5 focus:bg-white focus:ring-primary/20 transition-all font-medium placeholder:text-muted-foreground/50"
+              />
+              <div className="absolute top-3 right-3 opacity-0 group-focus-within:opacity-100 transition-opacity">
+                <div className="px-2 py-1 rounded-md bg-primary/10 border border-primary/20 text-[10px] font-black uppercase text-primary tracking-widest">AI Ready</div>
+              </div>
+            </div>
+            <Button
+              disabled={loading}
+              className="mt-6 w-full rounded-2xl h-12 bg-primary hover:bg-primary/90 text-white shadow-xl shadow-primary/20 font-bold transition-all hover:scale-[1.01] active:scale-95 group"
+            >
+              {loading ? (
+                <div className="flex items-center gap-2">
+                  <div className="size-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <span>Dionysus is thinking...</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Sparkles className="size-4 group-hover:rotate-12 transition-transform" />
+                  <span>Ask Dionysus!</span>
+                </div>
+              )}
             </Button>
           </form>
         </CardContent>

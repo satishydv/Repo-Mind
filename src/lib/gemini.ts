@@ -5,7 +5,7 @@ import 'dotenv/config';
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 const model = genAI.getGenerativeModel({
-  model: 'gemini-1.5-flash'
+  model: 'gemini-2.0-flash-exp'
 })
 
 export const aiSummariseCommit = async (diff: string) => {
@@ -13,7 +13,7 @@ export const aiSummariseCommit = async (diff: string) => {
   if (!process.env.GEMINI_API_KEY) {
     throw new Error('GEMINI_API_KEY environment variable is not set. Please add it to your .env file');
   }
-  
+
   // https://github.com/docker/genai-stack/commit/<commithash>.diff
   const response = await model.generateContent([
     'You are an expert programmer, and you are trying to summarize a git diff.',
@@ -50,14 +50,14 @@ export const aiSummariseCommit = async (diff: string) => {
 
 export async function summariseCode(doc: Document) {
   console.log("getting summary for", doc.metadata.source);
-  
+
   const maxRetries = 3;
   let retryCount = 0;
-  
+
   while (retryCount < maxRetries) {
-  try {
-    const code = doc.pageContent.slice(0, 10000); // Limit to 10000 characters
-    const response = await model.generateContent(`
+    try {
+      const code = doc.pageContent.slice(0, 10000); // Limit to 10000 characters
+      const response = await model.generateContent(`
       You are an intelligent senior software engineer who specialises in onboarding junior software engineers onto projects.
       
       You are onboarding a junior software engineer and explaining to them the purpose of the ${doc.metadata.source} file.
@@ -69,11 +69,11 @@ export async function summariseCode(doc: Document) {
       
       Give a summary no more than 100 words of the code above
     `);
-    
-    return response.response.text();
+
+      return response.response.text();
     } catch (error: any) {
       retryCount++;
-      
+
       // Check if it's a rate limit error
       if (error.status === 429 && retryCount < maxRetries) {
         const delay = Math.pow(2, retryCount) * 1000; // Exponential backoff: 2s, 4s, 8s
@@ -81,12 +81,12 @@ export async function summariseCode(doc: Document) {
         await new Promise(resolve => setTimeout(resolve, delay));
         continue;
       }
-      
-    console.error("Error generating summary:", error);
-    return "";
+
+      console.error("Error generating summary:", error);
+      return "";
+    }
   }
-  }
-  
+
   return "";
 }
 
@@ -95,14 +95,14 @@ export const generateEmbedding = async (text: string) => {
   // This creates a 768-dimensional vector to match the database schema
   const vectorSize = 768;
   const embedding = new Array(vectorSize).fill(0);
-  
+
   // Simple hash-based embedding generation
   for (let i = 0; i < text.length; i++) {
     const charCode = text.charCodeAt(i);
     const position = (charCode * (i + 1)) % vectorSize;
     embedding[position] += 1;
   }
-  
+
   // Normalize the vector
   const magnitude = Math.sqrt(embedding.reduce((sum, val) => sum + val * val, 0));
   if (magnitude > 0) {
@@ -110,7 +110,7 @@ export const generateEmbedding = async (text: string) => {
       embedding[i] = embedding[i] / magnitude;
     }
   }
-  
+
   return embedding;
 }
 

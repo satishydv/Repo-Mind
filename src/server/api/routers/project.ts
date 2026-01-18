@@ -23,9 +23,17 @@ export const projectRouter = createTRPCRouter({
                 }
             }
         });
-        await indexGithubRepo(project.id, input.githubUrl, input.githubToken);
-        // call pollCommits every time we create a project async is used to wait for the pollCommits to finish
-        await pollCommits(project.id);
+
+        // Run indexing and commit polling in the background without blocking
+        // This prevents the mutation from failing if these operations take too long or error out
+        indexGithubRepo(project.id, input.githubUrl, input.githubToken)
+            .then(() => console.log('✅ Successfully indexed repository'))
+            .catch((error) => console.error('❌ Error indexing repository:', error));
+
+        pollCommits(project.id)
+            .then(() => console.log('✅ Successfully polled commits'))
+            .catch((error) => console.error('❌ Error polling commits:', error));
+
         return project;
     }),
     getProjects: protectedProcedure.query(async ({ ctx }) => {

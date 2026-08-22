@@ -77,6 +77,7 @@ const generateEmbeddings = async (docs: Document[]) => {
   
   for (let i = 0; i < docs.length; i++) {
     const doc = docs[i]
+    if (!doc) continue
     console.log(`Processing file ${i + 1} of ${docs.length}: ${doc.metadata.source}`)
     
     try {
@@ -85,7 +86,10 @@ const generateEmbeddings = async (docs: Document[]) => {
       console.log('Summary generated for:', doc.metadata.source, 'Length:', summary.length)
       
       console.log('Generating embedding for:', doc.metadata.source)
-      const embedding = await generateEmbedding(summary)
+      const textToEmbed = (summary && summary.trim().length > 10)
+        ? summary
+        : `${doc.metadata.source}\n${(doc.pageContent || '').slice(0, 2000)}`
+      const embedding = await generateEmbedding(textToEmbed)
       console.log('Embedding generated for:', doc.metadata.source, 'Vector size:', embedding.length)
       
       results.push({

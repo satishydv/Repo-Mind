@@ -27,6 +27,7 @@ model User {
 
     // Many-to-many relationship with Project through UserToProject
     userToProjects UserToProject[]
+    questions      Question[]
 }
 
 model Project {
@@ -38,6 +39,7 @@ model Project {
     deletedAt DateTime?
     commits       Commit[]
     sourceCodeEmbeddings SourceCodeEmbedding[]
+    questions     Question[]
 
     // Many-to-many relationship with User through UserToProject
     userToProjects UserToProject[]
@@ -81,5 +83,21 @@ model SourceCodeEmbedding {
     summary            String
     projectId          String
     project            Project @relation(fields: [projectId], references: [id])
+}
+
+model Question {
+    id              String   @id @default(cuid())
+    createdAt       DateTime @default(now())
+    updatedAt       DateTime @updatedAt
+
+    question        String
+    answer          String
+    filesReferences Json?
+
+    projectId       String
+    project         Project  @relation(fields: [projectId], references: [id])
+
+    userId          String
+    user            User     @relation(fields: [userId], references: [id])
 }
 

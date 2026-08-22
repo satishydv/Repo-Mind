@@ -2,6 +2,8 @@ import { SidebarProvider } from '@/components/ui/sidebar'
 import { UserButton } from '@clerk/nextjs'
 import React from 'react'
 import { AppSidebar } from './app-sidebar'
+import { Search } from 'lucide-react'
+import { Input } from '@/components/ui/input'
 
 type Props = {
     children: React.ReactNode
@@ -10,30 +12,35 @@ type Props = {
 const SidebarLayout = ({ children }: Props) => {
     return (
         <SidebarProvider>
-            <AppSidebar />
-            <main className="w-full flex-1 flex flex-col min-h-screen bg-gradient p-2 md:p-4 transition-all duration-300">
-                <div className='flex items-center glass rounded-xl px-6 py-3 mb-4 shadow-sm border-white/10'>
-                    <div className="flex items-center gap-2">
-                        <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Project Dashboard</span>
-                    </div>
-                    <div className='ml-auto flex items-center gap-4'>
-                        <UserButton
-                            appearance={{
-                                elements: {
-                                    userButtonAvatarBox: "size-9 border-2 border-primary/20 hover:border-primary/50 transition-all shadow-sm"
-                                }
-                            }}
-                        />
-                    </div>
-                </div>
+            <div className="flex min-h-screen w-full bg-slate-50 text-gray-900">
+                <AppSidebar />
+                <main className="flex-1 flex flex-col min-w-0">
+                    {/* Top Bar matching Image 1 */}
+                    <header className="h-16 px-6 border-b border-gray-200 bg-white flex items-center justify-between gap-4 sticky top-0 z-30">
+                        <div className="relative flex-1 max-w-2xl">
+                            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-gray-400" />
+                            <Input
+                                placeholder="Search for projects, files, commits..."
+                                className="pl-10 h-10 w-full rounded-lg border-gray-200 bg-gray-50/50 focus:bg-white text-sm transition-colors placeholder:text-gray-400"
+                            />
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <UserButton
+                                appearance={{
+                                    elements: {
+                                        userButtonAvatarBox: "size-9 border border-gray-200 shadow-2xs"
+                                    }
+                                }}
+                            />
+                        </div>
+                    </header>
 
-                {/* main content */}
-                <div className='flex-1 glass border-white/10 shadow-xl rounded-2xl overflow-hidden flex flex-col'>
-                    <div className="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar">
+                    {/* Main Content Area */}
+                    <div className="flex-1 p-4 md:p-6 overflow-y-auto">
                         {children}
                     </div>
-                </div>
-            </main>
+                </main>
+            </div>
         </SidebarProvider>
     )
 }

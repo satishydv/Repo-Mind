@@ -1,123 +1,221 @@
 'use client'
+
 import { Button } from '@/components/ui/button'
-import { useUser } from '@clerk/nextjs'
-import React from 'react'
+import React, { useState } from 'react'
 import useProject from '@/hooks/use-project'
-import { ExternalLink, Github, Sparkles, Code2, Globe, Brain } from 'lucide-react'
+import { ExternalLink, Presentation, Upload, Plus, GitBranch, MessageSquareCode, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import Commit from './commit'
 import AskQuestionCard from '@/app/(protected)/dashboard/ask-question-card'
-
+import { QuestionSheet, type QuestionData } from '@/app/(protected)/qa/question-sheet'
+import { api } from '@/trpc/react'
+import { toast } from 'sonner'
+import { formatDistanceToNow } from 'date-fns'
 
 const DashboardPage = () => {
-  const { project } = useProject()
+  const { project, projectId } = useProject()
+  const [selectedQuestion, setSelectedQuestion] = useState<QuestionData | null>(null)
+  const [sheetOpen, setSheetOpen] = useState(false)
+
+  const ctx = api.useUtils()
+  const archiveProject = api.project.archiveProject.useMutation({
+    onSuccess: () => {
+      toast.success("Project archived")
+      ctx.project.getProjects.invalidate()
+    },
+    onError: () => {
+      toast.error("Failed to archive project")
+    }
+  })
+
+  const { data: questions } = api.project.getQuestions.useQuery(
+    { projectId: project?.id || '' },
+    { enabled: !!project?.id }
+  )
 
   if (!project) {
     return (
-      <div className="flex flex-col items-center justify-center h-[50vh] text-center">
-        <div className="p-6 bg-primary/5 rounded-full mb-6 animate-pulse">
-          <Github className="size-12 text-primary/40" />
+      <div className="flex flex-col items-center justify-center min-h-[50vh] text-center bg-white rounded-2xl border border-gray-200 p-8">
+        <div className="size-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-4">
+          <GitBranch className="size-7" />
         </div>
-        <h2 className="text-2xl font-bold mb-2">No project selected</h2>
-        <p className="text-muted-foreground max-w-sm">
-          Pick a project from the sidebar or create a new one to get started with AI insights.
+        <h2 className="text-xl font-bold text-gray-900 mb-2">No project selected</h2>
+        <p className="text-sm text-gray-500 max-w-sm mb-6">
+          Select an existing project from the sidebar or link a new repository to get started.
         </p>
+        <Link href="/create">
+          <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg gap-2 text-sm font-medium">
+            <Plus className="size-4" />
+            Create Project
+          </Button>
+        </Link>
       </div>
     )
   }
 
+  const handleArchive = () => {
+    if (window.confirm(`Are you sure you want to archive project "${project.name}"?`)) {
+      archiveProject.mutate({ projectId: project.id })
+    }
+  }
+
+  const handleOpenQuestion = (q: any) => {
+    setSelectedQuestion(q)
+    setSheetOpen(true)
+  }
+
+  const hasSavedQuestions = questions && questions.length > 0
+
   return (
-    <div className="mx-auto max-w-7xl space-y-8 animate-in fade-in zoom-in-95 duration-700">
-      {/* Project Header Card */}
-      <div className="relative overflow-hidden rounded-[2.5rem] bg-mesh p-8 md:p-12 text-foreground shadow-2xl border border-white/20">
-        <div className="absolute top-0 right-0 -mr-16 -mt-16 size-96 rounded-full bg-pastel-pink/20 blur-[100px] animate-pulse" />
-        <div className="absolute bottom-0 left-0 -ml-16 -mb-16 size-64 rounded-full bg-pastel-blue/20 blur-[100px] animate-pulse delay-1000" />
+    <div className="space-y-6 max-w-7xl mx-auto">
+      {/* Top Banner Matching Image 1 */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        {/* Blue Linked Repository Pill */}
+        <Link
+          href={project.githubUrl}
+          target="_blank"
+          className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition-colors shadow-2xs w-fit max-w-full truncate"
+        >
+          <svg className="size-4 shrink-0 fill-current" viewBox="0 0 24 24">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+          </svg>
+          <span className="truncate">This project is linked to {project.githubUrl}</span>
+          <ExternalLink className="size-3.5 shrink-0 opacity-80" />
+        </Link>
 
-        <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-8">
-          <div className="space-y-4">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-white/40 dark:bg-white/10 rounded-2xl backdrop-blur-xl border border-white/40 shadow-xl shadow-primary/5">
-                <Github className="size-8 text-primary" />
-              </div>
-              <div>
-                <h1 className="text-4xl font-black tracking-tight leading-none mb-2">{project.name}</h1>
-                <div className="flex items-center gap-2 text-muted-foreground font-semibold">
-                  <Globe className="size-4" />
-                  <Link
-                    href={project.githubUrl}
-                    target="_blank"
-                    className="hover:text-primary transition-colors flex items-center gap-1 underline underline-offset-4 decoration-primary/30"
-                  >
-                    <span className="text-sm truncate max-w-[200px] md:max-w-md">{project.githubUrl}</span>
-                    <ExternalLink className="size-3" />
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
+        {/* Right Action Buttons */}
+        <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            onClick={() => {
+              navigator.clipboard.writeText(window.location.href)
+              toast.success("Project invite link copied!")
+            }}
+            className="h-10 px-4 rounded-lg border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium shadow-2xs"
+          >
+            Invite a team member!
+          </Button>
 
-          <div className="flex flex-wrap items-center gap-3">
-            <Button variant="outline" className="rounded-2xl h-12 px-6 border-white/40 glass hover:bg-white/60 transition-all font-bold group">
-              <Sparkles className="size-4 mr-2 text-rose-500 group-hover:scale-110 transition-transform" />
-              Analyze Project
-            </Button>
-            <Button className="rounded-2xl h-12 px-6 bg-primary hover:bg-primary/90 text-white shadow-xl shadow-primary/20 font-bold transition-all hover:scale-105 active:scale-95">
-              Add Contributors
-            </Button>
-          </div>
+          <Button
+            variant="outline"
+            onClick={handleArchive}
+            disabled={archiveProject.isPending}
+            className="h-10 px-4 rounded-lg border-gray-200 bg-white hover:bg-red-50 hover:text-red-600 hover:border-red-200 text-gray-700 text-sm font-medium transition-colors shadow-2xs"
+          >
+            Archive
+          </Button>
         </div>
       </div>
 
-      {/* Quick Stats bar */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {[
-          { label: 'Commits', value: '1,284', color: 'text-blue-500', bg: 'glass-blue' },
-          { label: 'Issues', value: '12', color: 'text-rose-500', bg: 'glass-pink' },
-          { label: 'Contributors', value: '8', color: 'text-emerald-500', bg: 'glass-emerald' },
-          { label: 'Files', value: '452', color: 'text-amber-500', bg: 'glass-amber' },
-        ].map((stat, i) => (
-          <div key={i} className={`p-4 rounded-3xl ${stat.bg} border-white/10 shadow-sm flex flex-col items-center justify-center gap-1 group hover:scale-[1.02] transition-all`}>
-            <span className="text-xs font-black uppercase tracking-widest text-muted-foreground/80">{stat.label}</span>
-            <span className={`text-2xl font-black ${stat.color} tabular-nums`}>{stat.value}</span>
+      {/* Row of 2 Cards: Left Ask Question, Right Saved Questions or Meeting */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Left Card: Ask a Question */}
+        <div>
+          <AskQuestionCard />
+        </div>
+
+        {/* Right Card: Saved Questions if available, else Create Meeting card */}
+        {hasSavedQuestions ? (
+          <div className="border border-gray-200 rounded-xl p-6 bg-white shadow-2xs flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-4 pb-2 border-b border-gray-100">
+                <div className="flex items-center gap-2.5">
+                  <div className="size-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+                    <MessageSquareCode className="size-4.5" />
+                  </div>
+                  <div>
+                    <h2 className="text-base font-bold text-gray-900 leading-none">Saved Questions</h2>
+                    <span className="text-xs text-gray-400 font-normal">
+                      {questions.length} {questions.length === 1 ? 'question' : 'questions'} saved
+                    </span>
+                  </div>
+                </div>
+                <Link
+                  href="/qa"
+                  className="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1 transition-colors"
+                >
+                  <span>View all</span>
+                  <ArrowRight className="size-3.5" />
+                </Link>
+              </div>
+
+              {/* Questions list */}
+              <div className="space-y-2.5 max-h-[220px] overflow-y-auto custom-scrollbar pr-1">
+                {questions.slice(0, 3).map((q) => {
+                  let timeAgo = ''
+                  try {
+                    timeAgo = formatDistanceToNow(new Date(q.createdAt), { addSuffix: true })
+                  } catch {
+                    timeAgo = ''
+                  }
+
+                  const answerSnippet = q.answer
+                    ? q.answer.replace(/\n+/g, ' ').slice(0, 90) + '...'
+                    : 'Click to view answer'
+
+                  return (
+                    <div
+                      key={q.id}
+                      onClick={() => handleOpenQuestion(q)}
+                      className="p-3 rounded-lg border border-gray-100 hover:border-blue-200 bg-gray-50/50 hover:bg-blue-50/30 transition-all cursor-pointer group"
+                    >
+                      <div className="flex items-baseline justify-between gap-2 mb-1">
+                        <h4 className="text-xs sm:text-sm font-semibold text-gray-900 group-hover:text-blue-600 transition-colors truncate">
+                          {q.question}
+                        </h4>
+                        {timeAgo && (
+                          <span className="text-[11px] text-gray-400 font-normal shrink-0">
+                            {timeAgo}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-gray-500 line-clamp-1 font-normal">
+                        {answerSnippet}
+                      </p>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+
+            <div className="pt-3 mt-3 border-t border-gray-100">
+              <Link href="/qa" className="block w-full">
+                <Button variant="outline" className="w-full h-8 text-xs font-medium text-gray-700 border-gray-200 hover:bg-gray-50 rounded-lg">
+                  Open full Q&A page
+                </Button>
+              </Link>
+            </div>
           </div>
-        ))}
+        ) : (
+          <div className="border border-gray-200 rounded-xl p-6 bg-white shadow-2xs flex flex-col items-center justify-center text-center">
+            <div className="size-12 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-800 mb-3 shadow-2xs">
+              <Presentation className="size-6 text-gray-800" />
+            </div>
+            <h3 className="text-base font-bold text-gray-900">Create a new meeting</h3>
+            <p className="text-xs text-gray-500 max-w-xs mt-1 mb-5">
+              Analyse your meeting with RepoMind. Powered by AI.
+            </p>
+            <Link href="/meetings">
+              <Button className="rounded-lg h-9 px-5 bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm transition-colors flex items-center gap-2 shadow-2xs">
+                <Upload className="size-3.5" />
+                <span>Upload Meeting</span>
+              </Button>
+            </Link>
+          </div>
+        )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* AI Interaction Section */}
-        <section className="lg:col-span-7 space-y-4">
-          <div className="flex items-center justify-between px-2">
-            <div className="flex items-center gap-3">
-              <div className="size-10 rounded-xl bg-purple-500/10 flex items-center justify-center border border-purple-500/20">
-                <Brain className="size-5 text-purple-500" />
-              </div>
-              <h2 className="text-2xl font-black tracking-tight">AI Assistant</h2>
-            </div>
-          </div>
-          <div className="rounded-[2.5rem] p-1 glass-purple border-purple-500/10 shadow-2xl shadow-purple-500/5">
-            <div className="bg-card dark:bg-black/20 rounded-[2.25rem] overflow-hidden">
-              <AskQuestionCard />
-            </div>
-          </div>
-        </section>
-
-        {/* Commit History Section */}
-        <section className="lg:col-span-5 space-y-4">
-          <div className="flex items-center justify-between px-2">
-            <div className="flex items-center gap-3">
-              <div className="size-10 rounded-xl bg-amber-500/10 flex items-center justify-center border border-amber-500/20">
-                <Code2 className="size-5 text-amber-500" />
-              </div>
-              <h2 className="text-2xl font-black tracking-tight">Recent Activity</h2>
-            </div>
-          </div>
-          <div className="rounded-[2.5rem] p-1 glass-amber border-amber-500/10 shadow-2xl shadow-amber-500/5 h-full">
-            <div className="bg-card dark:bg-black/20 rounded-[2.25rem] p-6 h-[calc(100%-8px)] overflow-y-auto custom-scrollbar">
-              <Commit />
-            </div>
-          </div>
-        </section>
+      {/* Recent Commit History Section */}
+      <div className="space-y-4 pt-2">
+        <Commit />
       </div>
+
+      {/* Slide-Over Modal Drawer when clicking a saved question */}
+      <QuestionSheet
+        question={selectedQuestion}
+        open={sheetOpen}
+        setOpen={setSheetOpen}
+      />
     </div>
   )
 }

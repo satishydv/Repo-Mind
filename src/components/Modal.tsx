@@ -43,17 +43,8 @@ export default function Modal({ children, open, setOpen }: SimpleModalProps) {
               leaveFrom="opacity-100 translate-y-0 sm:scale-100"
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
-              <Dialog.Panel className="relative transform overflow-hidden rounded-2xl glass border-white/20 shadow-2xl transition-all w-full max-w-5xl max-h-[90vh] flex flex-col">
-                {/* Close button */}
-                <button
-                  onClick={() => setOpen(false)}
-                  className="absolute top-5 right-5 z-20 rounded-full p-2 hover:bg-white/10 text-muted-foreground hover:text-foreground transition-all border border-white/10 glass shadow-sm"
-                  ref={cancelButtonRef}
-                >
-                  <X className="h-5 w-5" />
-                </button>
-
-                <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
+              <Dialog.Panel className="relative transform overflow-hidden rounded-2xl bg-white shadow-2xl transition-all w-full max-w-4xl max-h-[90vh] flex flex-col border border-gray-200">
+                <div className="flex-1 overflow-y-auto custom-scrollbar">
                   {children}
                 </div>
               </Dialog.Panel>

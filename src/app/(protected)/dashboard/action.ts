@@ -1,14 +1,11 @@
 'use server'
 
-import { streamText } from 'ai'
-import { createGoogleGenerativeAI } from '@ai-sdk/google'
+import { GoogleGenerativeAI } from '@google/generative-ai'
 import { generateEmbedding } from '@/lib/gemini'
 import { db } from '@/server/db'
 import { createStreamableValue } from 'ai/rsc'
 
-const google = createGoogleGenerativeAI({
-  apiKey: process.env.GEMINI_API_KEY,
-})
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
 
 export async function askQuestion(question: string, projectId: string) {
   console.log('🤖 Starting askQuestion for project:', projectId)
@@ -19,15 +16,30 @@ export async function askQuestion(question: string, projectId: string) {
 
   const vectorQuery = `[${queryVector.join(',')}]`
   const vectorStart = Date.now()
-  const result = await db.$queryRaw`
+  
+  // First attempt: search with 0.3 similarity threshold
+  let result = await db.$queryRaw`
     SELECT "fileName", "sourceCode", "summary",
     1 - ("summaryEmbedding" <=> ${vectorQuery}::vector) AS similarity
     FROM "SourceCodeEmbedding"
-    WHERE 1 - ("summaryEmbedding" <=> ${vectorQuery}::vector) > 0.5
+    WHERE 1 - ("summaryEmbedding" <=> ${vectorQuery}::vector) > 0.3
     AND "projectId" = ${projectId}
     ORDER BY similarity DESC
     LIMIT 10
   ` as { fileName: string; sourceCode: string; summary: string }[]
+
+  // Fallback for general questions (e.g. "what is this"): take top matching files for project
+  if (!result || result.length === 0) {
+    result = await db.$queryRaw`
+      SELECT "fileName", "sourceCode", "summary",
+      1 - ("summaryEmbedding" <=> ${vectorQuery}::vector) AS similarity
+      FROM "SourceCodeEmbedding"
+      WHERE "projectId" = ${projectId}
+      ORDER BY similarity DESC
+      LIMIT 6
+    ` as { fileName: string; sourceCode: string; summary: string }[]
+  }
+
   console.log('✅ Vector search completed in', Date.now() - vectorStart, 'ms. Found', result.length, 'matches.')
 
   let context = ''
@@ -40,9 +52,8 @@ export async function askQuestion(question: string, projectId: string) {
   const streamStart = Date.now()
     ; (async () => {
       try {
-        const { textStream } = await streamText({
-          model: google('gemini-2.0-flash-exp'),
-          prompt: `
+        const model = genAI.getGenerativeModel({ model: 'gemini-3.5-flash' })
+        const prompt = `
           You are a AI code assistant who answers questions about the codebase. Your target audience is a technical intern.
           AI assistant is a brand new, powerful, human-like artificial intelligence.
           The traits of AI include expert knowledge, helpfulness, cleverness, and articulateness.
@@ -65,10 +76,14 @@ export async function askQuestion(question: string, projectId: string) {
           AI assistant will not invent anything that is not drawn directly from the context.
           Answer in markdown syntax, with code snippets if needed. Be as detailed as possible when answering, make sure there is no ambiguity.
         `
-        })
 
-        for await (const delta of textStream) {
-          stream.update(delta)
+        const response = await model.generateContentStream(prompt)
+
+        for await (const chunk of response.stream) {
+          const text = chunk.text()
+          if (text) {
+            stream.update(text)
+          }
         }
         stream.done()
         console.log('✅ Stream completed successfully in', Date.now() - streamStart, 'ms')

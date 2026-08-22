@@ -67,6 +67,15 @@
   --pastel-amber: oklch(0.9 0.08 80);
   --pastel-purple: oklch(0.9 0.08 300);
 
+  /* Vibrant Palette */
+  --vibrant-pink: oklch(0.65 0.25 0);
+  --vibrant-blue: oklch(0.65 0.25 260);
+  --vibrant-emerald: oklch(0.65 0.25 160);
+  --vibrant-amber: oklch(0.65 0.25 80);
+  --vibrant-purple: oklch(0.65 0.25 300);
+  --vibrant-indigo: oklch(0.6 0.25 280);
+  --vibrant-orange: oklch(0.65 0.2 60);
+
   --secondary: var(--pastel-blue);
   --secondary-foreground: oklch(0.4 0.2 260);
 
@@ -110,6 +119,14 @@
   --pastel-emerald: oklch(0.4 0.15 160);
   --pastel-amber: oklch(0.4 0.15 80);
   --pastel-purple: oklch(0.4 0.15 300);
+
+  --vibrant-pink: oklch(0.7 0.2 0);
+  --vibrant-blue: oklch(0.7 0.2 260);
+  --vibrant-emerald: oklch(0.7 0.2 160);
+  --vibrant-amber: oklch(0.7 0.2 80);
+  --vibrant-purple: oklch(0.7 0.2 300);
+  --vibrant-indigo: oklch(0.7 0.2 280);
+  --vibrant-orange: oklch(0.7 0.15 60);
 
   --secondary: oklch(0.18 0.04 260);
   --secondary-foreground: oklch(0.8 0.1 260);
@@ -172,6 +189,34 @@
     @apply bg-purple-500/5 dark:bg-purple-500/10 border-purple-500/20 backdrop-blur-xl;
   }
 
+  .glass-vibrant-pink {
+    @apply bg-rose-500/10 dark:bg-rose-500/20 border-rose-500/30 backdrop-blur-2xl shadow-lg shadow-rose-500/10;
+  }
+
+  .glass-vibrant-blue {
+    @apply bg-blue-500/10 dark:bg-blue-500/20 border-blue-500/30 backdrop-blur-2xl shadow-lg shadow-blue-500/10;
+  }
+
+  .glass-vibrant-emerald {
+    @apply bg-emerald-500/10 dark:bg-emerald-500/20 border-emerald-500/30 backdrop-blur-2xl shadow-lg shadow-emerald-500/10;
+  }
+
+  .glass-vibrant-amber {
+    @apply bg-amber-500/10 dark:bg-amber-500/20 border-amber-500/30 backdrop-blur-2xl shadow-lg shadow-amber-500/10;
+  }
+
+  .glass-vibrant-purple {
+    @apply bg-purple-500/10 dark:bg-purple-500/20 border-purple-500/30 backdrop-blur-2xl shadow-lg shadow-purple-500/10;
+  }
+
+  .glass-vibrant-indigo {
+    @apply bg-indigo-500/10 dark:bg-indigo-500/20 border-indigo-500/30 backdrop-blur-2xl shadow-lg shadow-indigo-500/10;
+  }
+
+  .glass-vibrant-orange {
+    @apply bg-orange-500/10 dark:bg-orange-500/20 border-orange-500/30 backdrop-blur-2xl shadow-lg shadow-orange-500/10;
+  }
+
   .text-gradient {
     @apply bg-clip-text text-transparent bg-linear-to-r from-primary via-purple-500 to-pink-500;
   }
@@ -186,5 +231,13 @@
       radial-gradient(at 100% 0%, oklch(0.85 0.15 320 / 0.15) 0px, transparent 50%),
       radial-gradient(at 100% 100%, oklch(0.85 0.15 160 / 0.15) 0px, transparent 50%),
       radial-gradient(at 0% 100%, oklch(0.85 0.15 40 / 0.15) 0px, transparent 50%);
+  }
+
+  .bg-mesh-vibrant {
+    background-image:
+      radial-gradient(at 0% 0%, oklch(0.65 0.25 260 / 0.1) 0px, transparent 60%),
+      radial-gradient(at 100% 0%, oklch(0.65 0.25 320 / 0.1) 0px, transparent 60%),
+      radial-gradient(at 100% 100%, oklch(0.65 0.25 160 / 0.1) 0px, transparent 60%),
+      radial-gradient(at 0% 100%, oklch(0.65 0.25 40 / 0.1) 0px, transparent 60%);
   }
 }

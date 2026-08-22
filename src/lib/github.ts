@@ -67,37 +67,46 @@ export const getCommitHashes = async (
  * 6. Returns the database operation result
  */
 export const pollCommits = async (projectId: string) => {
-    const { project, githubUrl } = await fetchProjectGithubUrl(projectId);
-    const commitHashes = await getCommitHashes(githubUrl);
-    const unprocessedCommits = await filterUnprocessedCommits(projectId, commitHashes);
-    
-    const summaryResponses = await Promise.allSettled(unprocessedCommits.map(commit => {
-        return summariseCommit(githubUrl, commit.commitHash);
-    }));
-    
-    const summaries = summaryResponses.map((response) => {
-        if (response.status === 'fulfilled') {
-            return response.value as string;
+    try {
+        const { project, githubUrl } = await fetchProjectGithubUrl(projectId);
+        const commitHashes = await getCommitHashes(githubUrl);
+        const unprocessedCommits = await filterUnprocessedCommits(projectId, commitHashes);
+        
+        if (!unprocessedCommits || unprocessedCommits.length === 0) {
+            return { count: 0 };
         }
-        return "";
-    });
-    
-    const commits = await db.commit.createMany({
-        data: summaries.map((summary, index) => {
-            console.log(`processing commit ${index}`);
-            return {
-                projectId: projectId,
-                commitHash: unprocessedCommits[index]?.commitHash || "",
-                commitMessage: unprocessedCommits[index]?.commitMessage || "",
-                commitAuthorName: unprocessedCommits[index]?.commitAuthorName || "",
-                commitAuthorAvatar: unprocessedCommits[index]?.commitAuthorAvatar || "",
-                commitDate: unprocessedCommits[index]?.commitDate || "",
-                summary
-            };
-        })
-    });
-    
-    return commits;
+
+        const summaryResponses = await Promise.allSettled(unprocessedCommits.map(commit => {
+            return summariseCommit(githubUrl, commit.commitHash);
+        }));
+        
+        const summaries = summaryResponses.map((response) => {
+            if (response.status === 'fulfilled') {
+                return response.value as string;
+            }
+            return "";
+        });
+        
+        const commits = await db.commit.createMany({
+            data: summaries.map((summary, index) => {
+                console.log(`processing commit ${index}`);
+                return {
+                    projectId: projectId,
+                    commitHash: unprocessedCommits[index]?.commitHash || "",
+                    commitMessage: unprocessedCommits[index]?.commitMessage || "",
+                    commitAuthorName: unprocessedCommits[index]?.commitAuthorName || "",
+                    commitAuthorAvatar: unprocessedCommits[index]?.commitAuthorAvatar || "",
+                    commitDate: unprocessedCommits[index]?.commitDate || "",
+                    summary
+                };
+            })
+        });
+        
+        return commits;
+    } catch (error: any) {
+        console.error('❌ Error in pollCommits for project', projectId, ':', error?.message || error);
+        return { count: 0 };
+    }
 }
 
 async function summariseCommit(githubUrl: string, commitHash: string) {

@@ -63,5 +63,53 @@ export const projectRouter = createTRPCRouter({
             where: { id: input.projectId },
             data: { deletedAt: new Date() }
         })
-    })
+    }),
+    saveAnswer: protectedProcedure.input(
+        z.object({
+            projectId: z.string(),
+            question: z.string(),
+            answer: z.string(),
+            filesReferences: z.any().optional(),
+        })
+    ).mutation(async ({ ctx, input }) => {
+        const userExists = await ctx.db.user.findUnique({
+            where: { id: ctx.user.userId! }
+        });
+        if (!userExists) {
+            await ctx.db.user.create({
+                data: {
+                    id: ctx.user.userId!,
+                    emailAddress: `${ctx.user.userId}@placeholder.com`,
+                }
+            }).catch(() => null);
+        }
+
+        return await ctx.db.question.create({
+            data: {
+                projectId: input.projectId,
+                userId: ctx.user.userId!,
+                question: input.question,
+                answer: input.answer,
+                filesReferences: input.filesReferences ?? [],
+            }
+        });
+    }),
+    getQuestions: protectedProcedure.input(
+        z.object({
+            projectId: z.string(),
+        })
+    ).query(async ({ ctx, input }) => {
+        if (!input.projectId) return [];
+        return await ctx.db.question.findMany({
+            where: {
+                projectId: input.projectId,
+            },
+            include: {
+                user: true,
+            },
+            orderBy: {
+                createdAt: "desc",
+            }
+        });
+    }),
 });

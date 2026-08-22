@@ -22,10 +22,10 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <ClerkProvider>
-      <html lang="en" className={`${geist.variable}`}>
-        <body className="light">
+      <html lang="en" className={`${geist.variable}`} suppressHydrationWarning>
+        <body className="light" suppressHydrationWarning>
           <TRPCReactProvider>{children}</TRPCReactProvider>
-          <Toaster richColors/>
+          <Toaster richColors />
         </body>
       </html>
     </ClerkProvider>

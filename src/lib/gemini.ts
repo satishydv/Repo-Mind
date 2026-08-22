@@ -5,7 +5,7 @@ import 'dotenv/config';
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 const model = genAI.getGenerativeModel({
-  model: 'gemini-2.0-flash-exp'
+  model: 'gemini-3.5-flash'
 })
 
 export const aiSummariseCommit = async (diff: string) => {
@@ -90,28 +90,39 @@ export async function summariseCode(doc: Document) {
   return "";
 }
 
-export const generateEmbedding = async (text: string) => {
-  // Simple embedding generation using a hash-based approach
-  // This creates a 768-dimensional vector to match the database schema
-  const vectorSize = 768;
-  const embedding = new Array(vectorSize).fill(0);
-
-  // Simple hash-based embedding generation
-  for (let i = 0; i < text.length; i++) {
-    const charCode = text.charCodeAt(i);
-    const position = (charCode * (i + 1)) % vectorSize;
-    embedding[position] += 1;
+export const generateEmbedding = async (text: string): Promise<number[]> => {
+  if (!text || text.trim().length === 0) {
+    return new Array(768).fill(0);
   }
 
-  // Normalize the vector
-  const magnitude = Math.sqrt(embedding.reduce((sum, val) => sum + val * val, 0));
-  if (magnitude > 0) {
-    for (let i = 0; i < vectorSize; i++) {
-      embedding[i] = embedding[i] / magnitude;
+  try {
+    const embeddingModel = genAI.getGenerativeModel({
+      model: 'gemini-embedding-001',
+    });
+
+    const result = await embeddingModel.embedContent({
+      content: { role: 'user', parts: [{ text: text.slice(0, 8000) }] },
+      outputDimensionality: 768,
+    } as any);
+
+    return result.embedding.values;
+  } catch (error) {
+    console.error('Error generating Gemini embedding, using fallback:', error);
+    const vectorSize = 768;
+    const embedding = new Array(vectorSize).fill(0);
+    for (let i = 0; i < text.length; i++) {
+      const charCode = text.charCodeAt(i);
+      const position = (charCode * (i + 1)) % vectorSize;
+      embedding[position] += 1;
     }
+    const magnitude = Math.sqrt(embedding.reduce((sum, val) => sum + val * val, 0));
+    if (magnitude > 0) {
+      for (let i = 0; i < vectorSize; i++) {
+        embedding[i] = embedding[i] / magnitude;
+      }
+    }
+    return embedding;
   }
-
-  return embedding;
-}
+};
 
 

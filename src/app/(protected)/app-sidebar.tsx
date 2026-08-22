@@ -53,25 +53,25 @@ export function AppSidebar() {
   const archiveProject = api.project.archiveProject.useMutation()
 
   return (
-    <Sidebar collapsible="icon" className="border-r border-gray-200 bg-white">
-      <SidebarHeader className="p-4 border-b border-gray-100 flex flex-row items-center justify-between">
+    <Sidebar collapsible="icon" className="border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 transition-colors">
+      <SidebarHeader className="p-4 border-b border-gray-100 dark:border-gray-800 flex flex-row items-center justify-between">
         <Link href="/dashboard" className="flex items-center gap-2.5">
           <div className="size-8 rounded-lg bg-blue-600 flex items-center justify-center text-white shadow-sm shrink-0">
             <GitBranch className="size-5" />
           </div>
           {open && (
-            <span className="text-xl font-bold tracking-tight text-gray-900">
+            <span className="text-xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
               RepoMind
             </span>
           )}
         </Link>
-        {open && <SidebarTrigger className="text-gray-400 hover:text-gray-600 size-8" />}
+        {open && <SidebarTrigger className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 size-8" />}
       </SidebarHeader>
 
       <SidebarContent className="px-3 py-4 space-y-6">
         {/* Application Navigation */}
         <SidebarGroup className="p-0">
-          <SidebarGroupLabel className="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
+          <SidebarGroupLabel className="px-3 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">
             Application
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -87,10 +87,10 @@ export function AppSidebar() {
                           'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
                           isActive
                             ? 'bg-blue-600 text-white shadow-sm hover:bg-blue-700 hover:text-white'
-                            : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                            : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
                         )}
                       >
-                        <item.icon className={cn("size-4.5 shrink-0", isActive ? "text-white" : "text-gray-500")} />
+                        <item.icon className={cn("size-4.5 shrink-0", isActive ? "text-white" : "text-gray-500 dark:text-gray-400")} />
                         {open && <span>{item.title}</span>}
                       </Link>
                     </SidebarMenuButton>
@@ -103,7 +103,7 @@ export function AppSidebar() {
 
         {/* Projects Section */}
         <SidebarGroup className="p-0">
-          <SidebarGroupLabel className="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
+          <SidebarGroupLabel className="px-3 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">
             Your Projects
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -120,8 +120,8 @@ export function AppSidebar() {
                         className={cn(
                           "flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-colors group",
                           isSelected
-                            ? "bg-blue-50 text-blue-900 font-semibold"
-                            : "text-gray-700 hover:bg-gray-100"
+                            ? "bg-blue-50 dark:bg-blue-950/60 text-blue-900 dark:text-blue-300 font-semibold"
+                            : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                         )}
                       >
                         <div
@@ -129,7 +129,7 @@ export function AppSidebar() {
                             "size-6 rounded-md flex items-center justify-center text-xs font-bold shrink-0 transition-colors",
                             isSelected
                               ? "bg-blue-600 text-white"
-                              : "border border-blue-500 text-blue-600 bg-white"
+                              : "border border-blue-500 text-blue-600 dark:text-blue-400 bg-white dark:bg-gray-800"
                           )}
                         >
                           {firstChar}
@@ -169,7 +169,7 @@ export function AppSidebar() {
                 <Link href="/create">
                   <Button
                     variant="outline"
-                    className="w-full flex items-center justify-center gap-2 h-9 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs font-medium shadow-2xs"
+                    className="w-full flex items-center justify-center gap-2 h-9 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-200 text-xs font-medium shadow-2xs transition-colors"
                   >
                     <Plus className="size-3.5" />
                     {open && <span>Create Project</span>}

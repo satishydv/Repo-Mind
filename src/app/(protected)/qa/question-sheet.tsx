@@ -72,16 +72,16 @@ export const QuestionSheet: React.FC<QuestionSheetProps> = ({
                 leaveFrom="translate-x-0"
                 leaveTo="translate-x-full"
               >
-                <Dialog.Panel className="pointer-events-auto w-screen max-w-2xl bg-white shadow-2xl flex flex-col h-full border-l border-gray-200">
+                <Dialog.Panel className="pointer-events-auto w-screen max-w-2xl bg-white dark:bg-gray-900 shadow-2xl flex flex-col h-full border-l border-gray-200 dark:border-gray-800 transition-colors">
                   {/* Top Bar with Close X matching Image 5 */}
-                  <div className="p-6 border-b border-gray-100 flex items-start justify-between gap-4">
-                    <h2 className="text-xl sm:text-2xl font-bold text-gray-900 leading-tight">
+                  <div className="p-6 border-b border-gray-100 dark:border-gray-800 flex items-start justify-between gap-4">
+                    <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 leading-tight">
                       {question.question}
                     </h2>
                     <button
                       type="button"
                       onClick={() => setOpen(false)}
-                      className="rounded-lg p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors shrink-0 cursor-pointer"
+                      className="rounded-lg p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors shrink-0 cursor-pointer"
                     >
                       <X className="size-5" />
                     </button>
@@ -90,7 +90,7 @@ export const QuestionSheet: React.FC<QuestionSheetProps> = ({
                   {/* Scrollable Content Body */}
                   <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
                     {/* Answer Text */}
-                    <div className="text-gray-800 text-sm sm:text-base leading-relaxed whitespace-pre-wrap font-normal">
+                    <div className="text-gray-800 dark:text-gray-200 text-sm sm:text-base leading-relaxed whitespace-pre-wrap font-normal">
                       {question.answer}
                     </div>
 

@@ -54,7 +54,7 @@ const QAPage = () => {
 
       {/* Saved Questions Section matching Image 4 */}
       <div className="space-y-4">
-        <h2 className="text-xl font-bold text-gray-900 tracking-tight">
+        <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">
           Saved Questions
         </h2>
 
@@ -63,24 +63,24 @@ const QAPage = () => {
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="animate-pulse p-4 rounded-xl border border-gray-200 bg-white flex items-center gap-4"
+                className="animate-pulse p-4 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 flex items-center gap-4"
               >
-                <div className="size-10 rounded-full bg-gray-200 shrink-0" />
+                <div className="size-10 rounded-full bg-gray-200 dark:bg-gray-800 shrink-0" />
                 <div className="flex-1 space-y-2">
-                  <div className="h-4 bg-gray-200 rounded w-1/3" />
-                  <div className="h-3.5 bg-gray-100 rounded w-2/3" />
+                  <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-1/3" />
+                  <div className="h-3.5 bg-gray-100 dark:bg-gray-800/60 rounded w-2/3" />
                 </div>
               </div>
             ))}
           </div>
         ) : !questions || questions.length === 0 ? (
-          <div className="border border-dashed border-gray-200 rounded-xl p-10 bg-white text-center">
-            <div className="size-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-3">
+          <div className="border border-dashed border-gray-200 dark:border-gray-800 rounded-xl p-10 bg-white dark:bg-gray-900 text-center transition-colors">
+            <div className="size-12 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center mx-auto mb-3">
               <MessageSquareCode className="size-6" />
             </div>
-            <p className="text-base font-semibold text-gray-900">No saved questions yet</p>
-            <p className="text-sm text-gray-500 max-w-md mx-auto mt-1">
-              Ask a question above and click <span className="font-semibold text-gray-700">"Save Answer"</span> in the response modal to save it here for quick reference.
+            <p className="text-base font-semibold text-gray-900 dark:text-gray-100">No saved questions yet</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 max-w-md mx-auto mt-1">
+              Ask a question above and click <span className="font-semibold text-gray-700 dark:text-gray-300">"Save Answer"</span> in the response modal to save it here for quick reference.
             </p>
           </div>
         ) : (
@@ -102,28 +102,28 @@ const QAPage = () => {
                 <div
                   key={q.id}
                   onClick={() => handleOpenQuestion(q)}
-                  className="border border-gray-200 rounded-xl p-4 bg-white hover:border-gray-300 hover:shadow-2xs transition-all cursor-pointer flex items-center gap-4 group"
+                  className="border border-gray-200 dark:border-gray-800 rounded-xl p-4 bg-white dark:bg-gray-900 hover:border-gray-300 dark:hover:border-gray-700 hover:shadow-2xs transition-all cursor-pointer flex items-center gap-4 group"
                 >
                   {/* User Avatar */}
                   <img
                     src={q.user?.imageUrl || "https://github.com/identicons/app.png"}
                     alt={q.user?.firstName || "User"}
-                    className="size-10 rounded-full bg-gray-100 border border-gray-200 shrink-0"
+                    className="size-10 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shrink-0"
                   />
 
-                  {/* Question & Snippet */}
+                  {/* Question and Answer snippet */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex flex-wrap items-baseline gap-2 mb-0.5">
-                      <h3 className="text-sm sm:text-base font-bold text-gray-900 group-hover:text-blue-600 transition-colors truncate">
+                    <div className="flex items-center justify-between gap-2">
+                      <h4 className="text-sm font-bold text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
                         {q.question}
-                      </h3>
+                      </h4>
                       {timeAgo && (
-                        <span className="text-xs text-gray-400 font-normal shrink-0">
+                        <span className="text-xs text-gray-400 dark:text-gray-500 shrink-0 font-normal">
                           {timeAgo}
                         </span>
                       )}
                     </div>
-                    <p className="text-xs sm:text-sm text-gray-500 truncate font-normal">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1 mt-0.5 font-normal">
                       {answerPreview}
                     </p>
                   </div>

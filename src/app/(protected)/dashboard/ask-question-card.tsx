@@ -71,9 +71,9 @@ const AskQuestionCard = () => {
   return (
     <>
       <Modal open={open} setOpen={setOpen}>
-        <div className="bg-white p-6 sm:p-8 rounded-2xl max-w-4xl w-full mx-auto space-y-6">
+        <div className="bg-white dark:bg-gray-900 p-6 sm:p-8 rounded-2xl max-w-4xl w-full mx-auto space-y-6 transition-colors">
           {/* Top Bar matching Image 3 */}
-          <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+          <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-4">
             <div className="flex items-center gap-3">
               <div className="size-8 rounded-lg bg-blue-600 flex items-center justify-center text-white shrink-0">
                 <GitBranch className="size-4.5" />
@@ -84,15 +84,15 @@ const AskQuestionCard = () => {
                 size="sm"
                 onClick={handleSave}
                 disabled={loading || !answer || saved || saveAnswer.isPending}
-                className="h-8 px-3 rounded-lg border-gray-200 text-xs font-semibold text-gray-700 hover:bg-gray-50 flex items-center gap-1.5 shadow-2xs"
+                className="h-8 px-3 rounded-lg border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 text-xs font-semibold text-gray-700 dark:text-gray-200 flex items-center gap-1.5 shadow-2xs transition-colors"
               >
-                <BookmarkPlus className="size-3.5 text-blue-600" />
+                <BookmarkPlus className="size-3.5 text-blue-600 dark:text-blue-400" />
                 <span>{saved ? "Saved" : saveAnswer.isPending ? "Saving..." : "Save Answer"}</span>
               </Button>
             </div>
             <button
               onClick={() => setOpen(false)}
-              className="text-gray-400 hover:text-gray-600 p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer"
             >
               <X className="size-5" />
             </button>
@@ -101,22 +101,22 @@ const AskQuestionCard = () => {
           {/* AI Answer Content */}
           <div className="space-y-3">
             {currentPrompt && (
-              <h3 className="text-lg font-bold text-gray-900 leading-snug">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 leading-snug">
                 {currentPrompt}
               </h3>
             )}
 
-            <div className="text-gray-800 text-sm md:text-base leading-relaxed whitespace-pre-wrap font-normal">
+            <div className="text-gray-800 dark:text-gray-200 text-sm md:text-base leading-relaxed whitespace-pre-wrap font-normal">
               {answer ? (
                 answer
               ) : loading ? (
                 <div className="space-y-3 animate-pulse py-2">
-                  <div className="h-4 bg-gray-200 rounded-md w-3/4"></div>
-                  <div className="h-4 bg-gray-200 rounded-md w-full"></div>
-                  <div className="h-4 bg-gray-200 rounded-md w-5/6"></div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded-md w-3/4"></div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded-md w-full"></div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded-md w-5/6"></div>
                 </div>
               ) : (
-                <p className="text-gray-500 text-sm italic">
+                <p className="text-gray-500 dark:text-gray-400 text-sm italic">
                   No answer generated. Please try again.
                 </p>
               )}
@@ -133,7 +133,7 @@ const AskQuestionCard = () => {
             <Button
               type="button"
               onClick={() => setOpen(false)}
-              className="w-full h-10 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm transition-colors"
+              className="w-full h-10 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm transition-colors cursor-pointer"
             >
               Close
             </Button>
@@ -142,10 +142,10 @@ const AskQuestionCard = () => {
       </Modal>
 
       {/* Ask Question Card on Page matching Image 1 */}
-      <div className="border border-gray-200 rounded-xl p-6 bg-white shadow-2xs">
+      <div className="border border-gray-200 dark:border-gray-800 rounded-xl p-6 bg-white dark:bg-gray-900 shadow-2xs transition-colors">
         <div className="mb-4">
-          <h2 className="text-lg font-bold text-gray-900 tracking-tight">Ask a question</h2>
-          <p className="text-sm text-gray-500 mt-0.5">
+          <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 tracking-tight">Ask a question</h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
             RepoMind has knowledge of the codebase
           </p>
         </div>
@@ -155,7 +155,7 @@ const AskQuestionCard = () => {
             placeholder="Which file should I edit to change the home page?"
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
-            className="min-h-[110px] rounded-lg border-gray-200 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm placeholder:text-gray-400 resize-y"
+            className="min-h-[110px] rounded-lg border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 resize-y transition-colors"
           />
 
           <Button

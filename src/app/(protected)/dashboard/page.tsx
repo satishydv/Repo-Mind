@@ -91,7 +91,7 @@ const DashboardPage = () => {
               navigator.clipboard.writeText(window.location.href)
               toast.success("Project invite link copied!")
             }}
-            className="h-10 px-4 rounded-lg border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium shadow-2xs"
+            className="h-10 px-4 rounded-lg border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-200 text-sm font-medium shadow-2xs transition-colors"
           >
             Invite a team member!
           </Button>
@@ -100,7 +100,7 @@ const DashboardPage = () => {
             variant="outline"
             onClick={handleArchive}
             disabled={archiveProject.isPending}
-            className="h-10 px-4 rounded-lg border-gray-200 bg-white hover:bg-red-50 hover:text-red-600 hover:border-red-200 text-gray-700 text-sm font-medium transition-colors shadow-2xs"
+            className="h-10 px-4 rounded-lg border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:bg-red-50 dark:hover:bg-red-950/40 hover:text-red-600 dark:hover:text-red-400 hover:border-red-200 dark:hover:border-red-900 text-gray-700 dark:text-gray-200 text-sm font-medium transition-colors shadow-2xs"
           >
             Archive
           </Button>
@@ -116,23 +116,23 @@ const DashboardPage = () => {
 
         {/* Right Card: Saved Questions if available, else Create Meeting card */}
         {hasSavedQuestions ? (
-          <div className="border border-gray-200 rounded-xl p-6 bg-white shadow-2xs flex flex-col justify-between">
+          <div className="border border-gray-200 dark:border-gray-800 rounded-xl p-6 bg-white dark:bg-gray-900 shadow-2xs flex flex-col justify-between transition-colors">
             <div>
-              <div className="flex items-center justify-between mb-4 pb-2 border-b border-gray-100">
+              <div className="flex items-center justify-between mb-4 pb-2 border-b border-gray-100 dark:border-gray-800">
                 <div className="flex items-center gap-2.5">
-                  <div className="size-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+                  <div className="size-8 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center">
                     <MessageSquareCode className="size-4.5" />
                   </div>
                   <div>
-                    <h2 className="text-base font-bold text-gray-900 leading-none">Saved Questions</h2>
-                    <span className="text-xs text-gray-400 font-normal">
+                    <h2 className="text-base font-bold text-gray-900 dark:text-gray-100 leading-none">Saved Questions</h2>
+                    <span className="text-xs text-gray-400 dark:text-gray-500 font-normal">
                       {questions.length} {questions.length === 1 ? 'question' : 'questions'} saved
                     </span>
                   </div>
                 </div>
                 <Link
                   href="/qa"
-                  className="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1 transition-colors"
+                  className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center gap-1 transition-colors"
                 >
                   <span>View all</span>
                   <ArrowRight className="size-3.5" />
@@ -157,19 +157,19 @@ const DashboardPage = () => {
                     <div
                       key={q.id}
                       onClick={() => handleOpenQuestion(q)}
-                      className="p-3 rounded-lg border border-gray-100 hover:border-blue-200 bg-gray-50/50 hover:bg-blue-50/30 transition-all cursor-pointer group"
+                      className="p-3 rounded-lg border border-gray-100 dark:border-gray-800 hover:border-blue-200 dark:hover:border-blue-700 bg-gray-50/50 dark:bg-gray-800/40 hover:bg-blue-50/30 dark:hover:bg-blue-950/30 transition-all cursor-pointer group"
                     >
                       <div className="flex items-baseline justify-between gap-2 mb-1">
-                        <h4 className="text-xs sm:text-sm font-semibold text-gray-900 group-hover:text-blue-600 transition-colors truncate">
+                        <h4 className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
                           {q.question}
                         </h4>
                         {timeAgo && (
-                          <span className="text-[11px] text-gray-400 font-normal shrink-0">
+                          <span className="text-[11px] text-gray-400 dark:text-gray-500 font-normal shrink-0">
                             {timeAgo}
                           </span>
                         )}
                       </div>
-                      <p className="text-xs text-gray-500 line-clamp-1 font-normal">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1 font-normal">
                         {answerSnippet}
                       </p>
                     </div>
@@ -178,25 +178,25 @@ const DashboardPage = () => {
               </div>
             </div>
 
-            <div className="pt-3 mt-3 border-t border-gray-100">
+            <div className="pt-3 mt-3 border-t border-gray-100 dark:border-gray-800">
               <Link href="/qa" className="block w-full">
-                <Button variant="outline" className="w-full h-8 text-xs font-medium text-gray-700 border-gray-200 hover:bg-gray-50 rounded-lg">
+                <Button variant="outline" className="w-full h-8 text-xs font-medium text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg">
                   Open full Q&A page
                 </Button>
               </Link>
             </div>
           </div>
         ) : (
-          <div className="border border-gray-200 rounded-xl p-6 bg-white shadow-2xs flex flex-col items-center justify-center text-center">
-            <div className="size-12 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-800 mb-3 shadow-2xs">
-              <Presentation className="size-6 text-gray-800" />
+          <div className="border border-gray-200 dark:border-gray-800 rounded-xl p-6 bg-white dark:bg-gray-900 shadow-2xs flex flex-col items-center justify-center text-center transition-colors">
+            <div className="size-12 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex items-center justify-center text-gray-800 dark:text-gray-200 mb-3 shadow-2xs">
+              <Presentation className="size-6 text-gray-800 dark:text-gray-200" />
             </div>
-            <h3 className="text-base font-bold text-gray-900">Create a new meeting</h3>
-            <p className="text-xs text-gray-500 max-w-xs mt-1 mb-5">
+            <h3 className="text-base font-bold text-gray-900 dark:text-gray-100">Create a new meeting</h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 max-w-xs mt-1 mb-5">
               Analyse your meeting with RepoMind. Powered by AI.
             </p>
             <Link href="/meetings">
-              <Button className="rounded-lg h-9 px-5 bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm transition-colors flex items-center gap-2 shadow-2xs">
+              <Button className="rounded-lg h-9 px-5 bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm transition-colors flex items-center gap-2 shadow-2xs cursor-pointer">
                 <Upload className="size-3.5" />
                 <span>Upload Meeting</span>
               </Button>

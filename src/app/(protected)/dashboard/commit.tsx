@@ -51,7 +51,7 @@ const Commit = () => {
         return (
           <div
             key={commit.id}
-            className="border border-gray-200 rounded-xl p-5 bg-white shadow-2xs hover:border-gray-300 transition-colors"
+            className="border border-gray-200 dark:border-gray-800 rounded-xl p-5 bg-white dark:bg-gray-900 shadow-2xs hover:border-gray-300 dark:hover:border-gray-700 transition-colors"
           >
             {/* Header: Author + relative time */}
             <div className="flex items-center justify-between gap-2 mb-2">
@@ -59,33 +59,33 @@ const Commit = () => {
                 <img
                   src={commit.commitAuthorAvatar || "https://github.com/identicons/app.png"}
                   alt={commit.commitAuthorName}
-                  className="size-7 rounded-full bg-gray-100 border border-gray-200 shrink-0"
+                  className="size-7 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shrink-0"
                 />
                 <Link
                   target="_blank"
                   href={`${project.githubUrl}/commit/${commit.commitHash}`}
-                  className="text-xs font-semibold text-gray-900 hover:text-blue-600 transition-colors inline-flex items-center gap-1 truncate"
+                  className="text-xs font-semibold text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors inline-flex items-center gap-1 truncate"
                 >
                   <span>{commit.commitAuthorName}</span>
-                  <span className="text-gray-500 font-normal">committed</span>
-                  <ExternalLink className="size-3 text-gray-400" />
+                  <span className="text-gray-500 dark:text-gray-400 font-normal">committed</span>
+                  <ExternalLink className="size-3 text-gray-400 dark:text-gray-500" />
                 </Link>
               </div>
               {timeAgo && (
-                <span className="text-xs text-gray-400 shrink-0 font-normal">
+                <span className="text-xs text-gray-400 dark:text-gray-500 shrink-0 font-normal">
                   {timeAgo}
                 </span>
               )}
             </div>
 
             {/* Commit Message Title */}
-            <h4 className="text-sm font-bold text-gray-900 leading-snug mb-2">
+            <h4 className="text-sm font-bold text-gray-900 dark:text-gray-100 leading-snug mb-2">
               {commit.commitMessage}
             </h4>
 
             {/* AI Summary Bullets in Clean Box */}
             {commit.summary && (
-              <pre className="font-mono text-xs text-gray-600 bg-gray-50/70 p-3 rounded-lg border border-gray-100 whitespace-pre-wrap leading-relaxed overflow-x-auto">
+              <pre className="font-mono text-xs text-gray-600 dark:text-gray-300 bg-gray-50/70 dark:bg-gray-950/70 p-3 rounded-lg border border-gray-100 dark:border-gray-800 whitespace-pre-wrap leading-relaxed overflow-x-auto custom-scrollbar">
                 {commit.summary}
               </pre>
             )}

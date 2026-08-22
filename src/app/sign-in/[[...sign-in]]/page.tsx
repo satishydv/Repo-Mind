@@ -1,86 +1,52 @@
 import { SignIn } from "@clerk/nextjs";
-import { Brain, Sparkles, Zap, Shield, Globe } from "lucide-react";
+import { GitBranch } from "lucide-react";
+import Link from "next/link";
 
 export default function Page() {
   return (
-    <div className="flex min-h-screen bg-background overflow-hidden">
-      {/* Left side - Marketing/Visual */}
-      <div className="hidden lg:flex lg:w-3/5 relative overflow-hidden bg-mesh p-12 flex-col justify-between">
-        <div className="absolute inset-0 opacity-30 mix-blend-overlay">
-          <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-pastel-pink rounded-full blur-[120px] animate-pulse" />
-          <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-pastel-blue rounded-full blur-[120px] animate-pulse delay-700" />
+    <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center p-4 sm:p-6 text-gray-900">
+      {/* Brand Logo Header */}
+      <Link href="/" className="flex items-center gap-2.5 mb-6 transition-opacity hover:opacity-80">
+        <div className="size-9 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-2xs">
+          <GitBranch className="size-5" />
         </div>
+        <span className="text-xl font-bold tracking-tight text-gray-900">RepoMind</span>
+      </Link>
 
-        <div className="relative z-10 flex items-center gap-3">
-          <div className="p-3 bg-white/20 backdrop-blur-xl rounded-2xl border border-white/30 shadow-2xl">
-            <Brain className="size-8 text-primary" />
-          </div>
-          <span className="text-3xl font-black tracking-tighter text-foreground uppercase">RepoMind</span>
-        </div>
+      {/* Clerk SignIn Component */}
+      <SignIn
+        appearance={{
+          elements: {
+            rootBox: "w-full max-w-[420px] flex justify-center",
+            card: "bg-white border border-gray-200 rounded-2xl shadow-xs p-6 sm:p-8 w-full",
+            headerTitle: "text-2xl font-bold text-gray-900 tracking-tight text-center",
+            headerSubtitle: "text-sm text-gray-500 text-center mt-1",
+            socialButtonsBlockButton: "rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-medium text-sm h-10 transition-colors shadow-2xs",
+            socialButtonsBlockButtonText: "font-medium text-gray-700 text-sm",
+            dividerRow: "my-4",
+            dividerLine: "bg-gray-200",
+            dividerText: "text-xs text-gray-400 font-normal uppercase",
+            formFieldLabel: "text-xs font-semibold text-gray-700 mb-1",
+            formFieldInput: "rounded-lg border border-gray-200 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm h-10 transition-colors placeholder:text-gray-400",
+            formButtonPrimary: "rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm h-10 shadow-2xs transition-colors cursor-pointer mt-2",
+            footerActionLink: "text-blue-600 hover:text-blue-700 font-semibold text-xs",
+            footerActionText: "text-xs text-gray-500",
+            identityPreviewText: "text-sm text-gray-700 font-medium",
+            identityPreviewEditButton: "text-blue-600 hover:text-blue-700 text-xs font-semibold",
+            formFieldSuccessText: "text-xs text-green-600",
+            formFieldErrorText: "text-xs text-red-500",
+            alert: "bg-red-50 border border-red-200 text-red-700 text-xs rounded-lg p-3",
+            footer: "mt-4 pt-4 border-t border-gray-100",
+          }
+        }}
+      />
 
-        <div className="relative z-10 space-y-8">
-          <div className="space-y-4">
-            <h1 className="text-6xl font-black tracking-tight leading-[1.1]">
-              Give your <span className="text-gradient">codebase</span> <br />
-              a second brain.
-            </h1>
-            <p className="text-xl text-muted-foreground max-w-lg font-medium leading-relaxed">
-              Experience the future of development with AI-powered insights,
-              automated summaries, and semantic code search.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 gap-6 max-w-xl">
-            {[
-              { icon: Sparkles, label: "AI Insights", color: "text-rose-500", bg: "bg-rose-500/10" },
-              { icon: Zap, label: "Fast Indexing", color: "text-amber-500", bg: "bg-amber-500/10" },
-              { icon: Shield, label: "Secure Analysis", color: "text-emerald-500", bg: "bg-emerald-500/10" },
-              { icon: Globe, label: "Global Search", color: "text-blue-500", bg: "bg-blue-500/10" },
-            ].map((item, i) => (
-              <div key={i} className="flex items-center gap-3 p-4 glass rounded-2xl border-white/10 group hover:border-primary/50 transition-all">
-                <div className={`p-2 rounded-xl ${item.bg} ${item.color}`}>
-                  <item.icon className="size-5" />
-                </div>
-                <span className="font-bold text-sm tracking-tight">{item.label}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="relative z-10 text-sm font-medium text-muted-foreground">
-          © 2024 RepoMind. All rights reserved.
-        </div>
-      </div>
-
-      {/* Right side - Login */}
-      <div className="flex-1 flex items-center justify-center p-8 lg:p-12 relative">
-        <div className="absolute lg:hidden inset-0 bg-mesh opacity-20" />
-        <div className="relative z-10 w-full max-w-[400px] animate-in fade-in slide-in-from-right-8 duration-700">
-          <div className="lg:hidden flex items-center gap-2 mb-8 justify-center">
-            <Brain className="size-8 text-primary" />
-            <span className="text-2xl font-bold uppercase tracking-tighter">RepoMind</span>
-          </div>
-
-          <div className="bg-white/50 dark:bg-black/20 backdrop-blur-2xl p-2 rounded-[2.5rem] shadow-2xl border border-white/20">
-            <SignIn
-              appearance={{
-                elements: {
-                  rootBox: "w-full",
-                  card: "shadow-none border-none bg-transparent w-full",
-                  headerTitle: "text-2xl font-bold tracking-tight",
-                  headerSubtitle: "text-muted-foreground",
-                  socialButtonsBlockButton: "rounded-xl border-border bg-white dark:bg-white/5 hover:bg-muted font-medium transition-all",
-                  formButtonPrimary: "rounded-xl bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 text-sm font-bold transition-all h-11",
-                  formFieldInput: "rounded-xl border-border bg-white dark:bg-white/5 h-11",
-                  footerActionLink: "text-primary hover:text-primary/80 font-bold",
-                  dividerLine: "bg-border",
-                  dividerText: "text-muted-foreground font-medium"
-                }
-              }}
-            />
-          </div>
-        </div>
-      </div>
+      {/* Footer */}
+      <footer className="text-xs text-gray-400 mt-8 text-center">
+        © 2026 RepoMind. AI-powered codebase intelligence.
+      </footer>
     </div>
   );
 }
+
+

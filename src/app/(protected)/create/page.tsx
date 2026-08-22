@@ -96,10 +96,10 @@ const CreatePage = () => {
                 {/* Right Side: Link GitHub Form matching Image 2 */}
                 <div className="lg:col-span-7 max-w-lg w-full mx-auto lg:mx-0 space-y-6">
                     <div>
-                        <h2 className="text-2xl font-bold text-gray-900 tracking-tight">
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">
                             Link your GitHub Repository
                         </h2>
-                        <p className="text-sm text-gray-500 mt-1">
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                             Enter the URL of your GitHub repository to link it to RepoMind.
                         </p>
                     </div>
@@ -107,49 +107,49 @@ const CreatePage = () => {
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                         {/* Project Name Input */}
                         <div className="relative">
-                            <FileText className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4.5 text-gray-400" />
+                            <FileText className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4.5 text-gray-400 dark:text-gray-500" />
                             <Input
                                 {...register('projectName', { required: true })}
                                 placeholder="ChatPDF"
-                                className="pl-10.5 h-11 rounded-lg border-gray-200 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm text-gray-900 placeholder:text-gray-400"
+                                className="pl-10.5 h-11 rounded-lg border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
                                 required
                             />
                         </div>
 
                         {/* GitHub Repository URL Input */}
                         <div className="relative">
-                            <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4.5 fill-gray-400" viewBox="0 0 24 24">
+                            <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4.5 fill-gray-400 dark:fill-gray-500" viewBox="0 0 24 24">
                                 <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
                             </svg>
                             <Input
                                 {...register('repoUrl', { required: true })}
                                 placeholder="https://github.com/elliott-chong/chatpdf-yt"
                                 type="url"
-                                className="pl-10.5 h-11 rounded-lg border-gray-200 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm text-gray-900 placeholder:text-gray-400"
+                                className="pl-10.5 h-11 rounded-lg border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
                                 required
                             />
                         </div>
 
                         {/* GitHub Token (Optional) Input */}
                         <div className="relative">
-                            <Key className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4.5 text-gray-400" />
+                            <Key className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4.5 text-gray-400 dark:text-gray-500" />
                             <Input
                                 {...register('githubToken')}
                                 placeholder="GitHub Token (optional, for private repositories)"
                                 type="password"
-                                className="pl-10.5 h-11 rounded-lg border-gray-200 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm text-gray-900 placeholder:text-gray-400"
+                                className="pl-10.5 h-11 rounded-lg border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
                             />
                         </div>
 
                         {/* Credit Charge Notice Box matching Image 2 */}
-                        <div className="bg-amber-50/80 border border-amber-200 rounded-lg p-3.5 flex items-start gap-2.5 text-xs text-amber-900">
-                            <Info className="size-4 text-amber-600 shrink-0 mt-0.5" />
+                        <div className="bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/60 rounded-lg p-3.5 flex items-start gap-2.5 text-xs text-amber-900 dark:text-amber-200 transition-colors">
+                            <Info className="size-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
                             <div className="space-y-0.5">
-                                <p className="font-medium text-amber-900">
-                                    You will be charged <span className="font-bold text-amber-950">46 credits</span> for this repository.
+                                <p className="font-medium text-amber-900 dark:text-amber-200">
+                                    You will be charged <span className="font-bold text-amber-950 dark:text-amber-100">46 credits</span> for this repository.
                                 </p>
-                                <p className="text-amber-700/90 font-normal">
-                                    You have <span className="font-semibold text-blue-700">150 credits</span> remaining.
+                                <p className="text-amber-700/90 dark:text-amber-300/80 font-normal">
+                                    You have <span className="font-semibold text-blue-700 dark:text-blue-400">150 credits</span> remaining.
                                 </p>
                             </div>
                         </div>
@@ -158,7 +158,7 @@ const CreatePage = () => {
                         <Button
                             type="submit"
                             disabled={createProject.isPending}
-                            className="w-auto h-10 px-6 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-medium text-sm transition-colors flex items-center justify-center gap-2 shadow-2xs cursor-pointer"
+                            className="w-auto h-10 px-6 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm transition-colors flex items-center justify-center gap-2 shadow-2xs cursor-pointer"
                         >
                             {createProject.isPending ? (
                                 <>

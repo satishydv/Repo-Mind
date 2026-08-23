@@ -4,7 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif,
+  --font-sans: "Gothic A1", ui-sans-serif, system-ui, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
@@ -103,22 +103,24 @@
 }
 
 .dark {
-  --background: oklch(0.1 0.02 260);
-  --foreground: oklch(0.98 0.01 240);
-  --card: oklch(0.12 0.03 260);
-  --card-foreground: oklch(0.98 0.01 240);
-  --popover: oklch(0.12 0.03 260);
-  --popover-foreground: oklch(0.98 0.01 240);
+  /* True Deep Pitch Black (GitHub / shadcn Zinc Dark) */
+  --background: oklch(0.05 0 0); /* #09090b / #0d1117 - Pitch Black */
+  --foreground: oklch(0.98 0 0); /* #f0f6fc / #ffffff - Crisp High Contrast White */
+  --card: oklch(0.09 0 0); /* #121216 / #161b22 - Deep Elevated Container */
+  --card-foreground: oklch(0.98 0 0);
+  --popover: oklch(0.09 0 0);
+  --popover-foreground: oklch(0.98 0 0);
 
-  --primary: oklch(0.7 0.15 260);
-  --primary-foreground: oklch(0.1 0.02 260);
+  /* shadcn Primary (High-Contrast White Button on Black) */
+  --primary: oklch(0.98 0 0);
+  --primary-foreground: oklch(0.08 0 0);
 
-  /* Dark Pastel/Vibrant */
-  --pastel-pink: oklch(0.4 0.15 0);
-  --pastel-blue: oklch(0.4 0.15 240);
-  --pastel-emerald: oklch(0.4 0.15 160);
-  --pastel-amber: oklch(0.4 0.15 80);
-  --pastel-purple: oklch(0.4 0.15 300);
+  /* Dark Pastel/Vibrant Accents */
+  --pastel-pink: oklch(0.35 0.12 0);
+  --pastel-blue: oklch(0.35 0.12 240);
+  --pastel-emerald: oklch(0.35 0.12 160);
+  --pastel-amber: oklch(0.35 0.12 80);
+  --pastel-purple: oklch(0.35 0.12 300);
 
   --vibrant-pink: oklch(0.7 0.2 0);
   --vibrant-blue: oklch(0.7 0.2 260);
@@ -128,39 +130,43 @@
   --vibrant-indigo: oklch(0.7 0.2 280);
   --vibrant-orange: oklch(0.7 0.15 60);
 
-  --secondary: oklch(0.18 0.04 260);
-  --secondary-foreground: oklch(0.8 0.1 260);
+  --secondary: oklch(0.14 0 0); /* #21262d */
+  --secondary-foreground: oklch(0.98 0 0);
 
-  --muted: oklch(0.16 0.03 260);
-  --muted-foreground: oklch(0.7 0.02 260);
+  --muted: oklch(0.12 0 0); /* #161b22 */
+  --muted-foreground: oklch(0.65 0 0); /* #8b949e - GitHub Muted Gray */
 
-  --accent: oklch(0.2 0.05 260);
-  --accent-foreground: oklch(0.95 0.05 260);
+  --accent: oklch(0.15 0 0); /* #21262d */
+  --accent-foreground: oklch(0.98 0 0);
 
-  --destructive: oklch(0.5 0.2 25);
-  --destructive-foreground: oklch(0.98 0.01 25);
+  --destructive: oklch(0.55 0.22 25);
+  --destructive-foreground: oklch(0.98 0 0);
 
-  --border: oklch(0.2 0.04 260);
-  --input: oklch(0.2 0.04 260);
-  --ring: oklch(0.7 0.15 260);
+  /* GitHub Crisp Borders */
+  --border: oklch(0.18 0 0); /* #30363d */
+  --input: oklch(0.18 0 0);
+  --ring: oklch(0.8 0 0);
 
-  --sidebar: oklch(0.11 0.03 260);
-  --sidebar-foreground: oklch(0.95 0.02 260);
-  --sidebar-primary: oklch(0.7 0.15 260);
-  --sidebar-primary-foreground: oklch(0.11 0.03 260);
-  --sidebar-accent: oklch(0.15 0.04 260);
-  --sidebar-accent-foreground: oklch(0.95 0.02 260);
-  --sidebar-border: oklch(0.18 0.04 260);
-  --sidebar-ring: oklch(0.7 0.15 260);
+  /* Sidebar Dark */
+  --sidebar: oklch(0.04 0 0); /* #010409 - Pitch Black Sidebar */
+  --sidebar-foreground: oklch(0.95 0 0);
+  --sidebar-primary: oklch(0.98 0 0);
+  --sidebar-primary-foreground: oklch(0.05 0 0);
+  --sidebar-accent: oklch(0.12 0 0);
+  --sidebar-accent-foreground: oklch(0.98 0 0);
+  --sidebar-border: oklch(0.16 0 0);
+  --sidebar-ring: oklch(0.8 0 0);
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    font-family: "Gothic A1", sans-serif;
   }
 
-  body {
+  html, body {
     @apply bg-background text-foreground;
+    font-family: "Gothic A1", sans-serif;
   }
 }
 

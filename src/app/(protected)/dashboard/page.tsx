@@ -3,7 +3,17 @@
 import { Button } from '@/components/ui/button'
 import React, { useState } from 'react'
 import useProject from '@/hooks/use-project'
-import { ExternalLink, Presentation, Upload, Plus, GitBranch, MessageSquareCode, ArrowRight } from 'lucide-react'
+import { ExternalLink, Presentation, Upload, Plus, GitBranch, MessageSquareCode, ArrowRight, Archive } from 'lucide-react'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import Link from 'next/link'
 import Commit from './commit'
 import AskQuestionCard from '@/app/(protected)/dashboard/ask-question-card'
@@ -16,12 +26,14 @@ const DashboardPage = () => {
   const { project, projectId } = useProject()
   const [selectedQuestion, setSelectedQuestion] = useState<QuestionData | null>(null)
   const [sheetOpen, setSheetOpen] = useState(false)
+  const [archiveDialogOpen, setArchiveDialogOpen] = useState(false)
 
   const ctx = api.useUtils()
   const archiveProject = api.project.archiveProject.useMutation({
     onSuccess: () => {
-      toast.success("Project archived")
+      toast.success("Project archived successfully")
       ctx.project.getProjects.invalidate()
+      setArchiveDialogOpen(false)
     },
     onError: () => {
       toast.error("Failed to archive project")
@@ -64,9 +76,7 @@ const DashboardPage = () => {
   }
 
   const handleArchive = () => {
-    if (window.confirm(`Are you sure you want to archive project "${project.name}"?`)) {
-      archiveProject.mutate({ projectId: project.id })
-    }
+    archiveProject.mutate({ projectId: project.id })
   }
 
   const handleOpenQuestion = (q: any) => {
@@ -101,16 +111,16 @@ const DashboardPage = () => {
               navigator.clipboard.writeText(window.location.href)
               toast.success("Project invite link copied!")
             }}
-            className="h-10 px-4 rounded-lg border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-200 text-sm font-medium shadow-2xs transition-colors"
+            className="h-10 px-4 rounded-lg border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-200 text-sm font-medium shadow-2xs transition-colors cursor-pointer"
           >
             Invite a team member!
           </Button>
 
           <Button
             variant="outline"
-            onClick={handleArchive}
+            onClick={() => setArchiveDialogOpen(true)}
             disabled={archiveProject.isPending}
-            className="h-10 px-4 rounded-lg border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:bg-red-50 dark:hover:bg-red-950/40 hover:text-red-600 dark:hover:text-red-400 hover:border-red-200 dark:hover:border-red-900 text-gray-700 dark:text-gray-200 text-sm font-medium transition-colors shadow-2xs"
+            className="h-10 px-4 rounded-lg border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:bg-red-50 dark:hover:bg-red-950/40 hover:text-red-600 dark:hover:text-red-400 hover:border-red-200 dark:hover:border-red-900 text-gray-700 dark:text-gray-200 text-sm font-medium transition-colors shadow-2xs cursor-pointer"
           >
             Archive
           </Button>
@@ -321,6 +331,50 @@ const DashboardPage = () => {
         open={sheetOpen}
         setOpen={setSheetOpen}
       />
+
+      {/* Archive Confirmation Popup Dialog */}
+      <AlertDialog
+        open={archiveDialogOpen}
+        onOpenChange={(isOpen) => {
+          if (!isOpen && !archiveProject.isPending) {
+            setArchiveDialogOpen(false)
+          }
+        }}
+      >
+        <AlertDialogContent className="sm:max-w-[420px] rounded-2xl p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xl">
+          <AlertDialogHeader className="text-left space-y-3">
+            <div className="size-11 rounded-xl bg-red-50 dark:bg-red-950/60 text-red-600 dark:text-red-400 flex items-center justify-center border border-red-100 dark:border-red-900/50">
+              <Archive className="size-5" />
+            </div>
+            <div>
+              <AlertDialogTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                Archive Project
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-sm text-gray-500 dark:text-gray-400 mt-1.5 leading-relaxed">
+                Are you sure you want to archive <span className="font-semibold text-gray-900 dark:text-gray-200">&ldquo;{project.name}&rdquo;</span>? This will hide the project from your active dashboard.
+              </AlertDialogDescription>
+            </div>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="mt-5 flex flex-row items-center justify-end gap-2.5 sm:space-x-0">
+            <AlertDialogCancel
+              disabled={archiveProject.isPending}
+              className="rounded-lg h-9 px-4 text-xs font-medium border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 transition-colors cursor-pointer"
+            >
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault()
+                handleArchive()
+              }}
+              disabled={archiveProject.isPending}
+              className="rounded-lg h-9 px-4 text-xs font-medium bg-red-600 hover:bg-red-700 text-white shadow-xs focus-visible:ring-red-500 transition-colors cursor-pointer"
+            >
+              {archiveProject.isPending ? "Archiving..." : "Archive Project"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

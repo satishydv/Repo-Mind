@@ -1,7 +1,6 @@
 import "@/styles/globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { type Metadata } from "next";
-import { Geist } from "next/font/google";
 
 import { TRPCReactProvider } from "@/trpc/react";
 import { Toaster } from "sonner";
@@ -13,17 +12,20 @@ export const metadata: Metadata = {
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
-const geist = Geist({
-  subsets: ["latin"],
-  variable: "--font-geist-sans",
-});
-
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <ClerkProvider>
-      <html lang="en" className={`${geist.variable}`} suppressHydrationWarning>
+      <html lang="en" suppressHydrationWarning>
+        <head>
+          <link rel="preconnect" href="https://fonts.googleapis.com" />
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+          <link
+            href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@100;200;300;400;500;600;700;800;900&display=swap"
+            rel="stylesheet"
+          />
+        </head>
         <body suppressHydrationWarning>
           <ThemeProvider
             attribute="class"
@@ -39,4 +41,5 @@ export default function RootLayout({
     </ClerkProvider>
   );
 }
+
 

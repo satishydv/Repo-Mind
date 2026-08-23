@@ -87,9 +87,27 @@ export async function askQuestion(question: string, projectId: string) {
         }
         stream.done()
         console.log('✅ Stream completed successfully in', Date.now() - streamStart, 'ms')
-      } catch (error) {
+      } catch (error: any) {
         console.error('❌ Error in AI stream:', error)
-        stream.error(error)
+        const errorStr = `${error?.status || ''} ${error?.message || ''} ${error?.statusText || ''} ${JSON.stringify(error || '')}`.toLowerCase()
+        const isRateLimit =
+          error?.status === 429 ||
+          errorStr.includes('429') ||
+          errorStr.includes('too many requests') ||
+          errorStr.includes('quota') ||
+          errorStr.includes('resource_exhausted') ||
+          errorStr.includes('resourceexhausted') ||
+          errorStr.includes('rate limit') ||
+          errorStr.includes('ratelimit')
+
+        if (isRateLimit) {
+          stream.update(
+            '\n\n> ⚠️ **Rate limit reached**: The Gemini AI API rate limit has been reached or is currently receiving too many requests. Please wait a moment and try again later.'
+          )
+          stream.done()
+        } else {
+          stream.error(error)
+        }
       }
     })()
 

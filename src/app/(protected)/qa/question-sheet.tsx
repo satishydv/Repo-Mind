@@ -4,6 +4,7 @@ import React, { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { X, FileCode2 } from "lucide-react";
 import { CodeReferences, type FileReference } from "@/components/code-references";
+import { MarkdownRenderer } from "@/components/markdown-renderer";
 
 export type QuestionData = {
   id: string;
@@ -90,9 +91,7 @@ export const QuestionSheet: React.FC<QuestionSheetProps> = ({
                   {/* Scrollable Content Body */}
                   <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
                     {/* Answer Text */}
-                    <div className="text-gray-800 dark:text-gray-200 text-sm sm:text-base leading-relaxed whitespace-pre-wrap font-normal">
-                      {question.answer}
-                    </div>
+                    <MarkdownRenderer content={question.answer} />
 
                     {/* Source Context Tabs & Code Viewer */}
                     {parsedFiles.length > 0 && (

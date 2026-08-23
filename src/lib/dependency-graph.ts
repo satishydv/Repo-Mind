@@ -501,6 +501,17 @@ Provide a concise, helpful, and technically accurate answer with markdown format
     return response.response.text()
   } catch (error: any) {
     console.error('Error asking module AI:', error)
+    const errStr = `${error?.status || ''} ${error?.message || ''} ${JSON.stringify(error || '')}`.toLowerCase()
+    if (
+      error?.status === 429 ||
+      errStr.includes('429') ||
+      errStr.includes('too many requests') ||
+      errStr.includes('quota') ||
+      errStr.includes('resource_exhausted') ||
+      errStr.includes('rate limit')
+    ) {
+      return '⚠️ **Rate Limit Reached**: The Gemini AI API rate limit has been reached. Please wait a moment and try again.'
+    }
     return `Unable to analyze module: ${error.message || 'AI request failed'}`
   }
 }

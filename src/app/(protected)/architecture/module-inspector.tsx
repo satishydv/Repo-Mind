@@ -29,6 +29,7 @@ import { api } from '@/trpc/react'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import type { GraphNodeData } from '@/lib/dependency-graph'
+import { MarkdownRenderer } from '@/components/markdown-renderer'
 
 interface ModuleInspectorProps {
   module: GraphNodeData | null
@@ -261,8 +262,8 @@ export function ModuleInspector({
                     <div className="font-semibold text-blue-600 dark:text-blue-400">
                       Q: {item.q}
                     </div>
-                    <div className="p-3 rounded-lg bg-gray-50 dark:bg-gray-850 border border-gray-100 dark:border-gray-800 text-gray-700 dark:text-gray-300 whitespace-pre-line leading-relaxed">
-                      {item.a}
+                    <div className="p-3 rounded-lg bg-gray-50 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-800">
+                      <MarkdownRenderer content={item.a} />
                     </div>
                   </div>
                 ))}

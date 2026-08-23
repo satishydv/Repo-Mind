@@ -4,11 +4,12 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Textarea } from "@/components/ui/textarea";
 import { askQuestion } from "./action";
-import { Sparkles, GitBranch, BookmarkPlus, X } from "lucide-react";
+import { Sparkles, GitBranch, BookmarkPlus, X, AlertTriangle, RefreshCw } from "lucide-react";
 import useProject from "@/hooks/use-project";
 import Modal from "@/components/Modal";
 import { readStreamableValue } from 'ai/rsc';
 import { CodeReferences, type FileReference } from "@/components/code-references";
+import { MarkdownRenderer } from "@/components/markdown-renderer";
 import { api } from "@/trpc/react";
 
 const AskQuestionCard = () => {
@@ -20,6 +21,8 @@ const AskQuestionCard = () => {
   const [filesReferences, setFilesReferences] = useState<FileReference[]>([]);
   const [answer, setAnswer] = useState('');
   const [saved, setSaved] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isRateLimited, setIsRateLimited] = useState(false);
 
   const saveAnswer = api.project.saveAnswer.useMutation({
     onSuccess: () => {
@@ -37,24 +40,61 @@ const AskQuestionCard = () => {
     setLoading(true);
     setOpen(true);
     setAnswer('');
+    setErrorMessage(null);
+    setIsRateLimited(false);
     setFilesReferences([]);
     setSaved(false);
-    setCurrentPrompt(question);
+    const submittedQuestion = question;
+    setCurrentPrompt(submittedQuestion);
 
     try {
-      const { output, filesReferences } = await askQuestion(question, project.id);
+      const { output, filesReferences } = await askQuestion(submittedQuestion, project.id);
       setFilesReferences(filesReferences || []);
 
       for await (const delta of readStreamableValue(output)) {
         if (delta) {
-          setAnswer(ans => ans + delta);
+          setAnswer(ans => {
+            const next = ans + delta;
+            if (next.toLowerCase().includes('rate limit reached')) {
+              setIsRateLimited(true);
+            }
+            return next;
+          });
         }
       }
-    } catch (error) {
-      toast.error("Failed to get answer");
-      console.error(error);
+    } catch (error: any) {
+      console.error('Error fetching question response:', error);
+      const errStr = `${error?.status || ''} ${error?.message || ''} ${JSON.stringify(error || '')}`.toLowerCase();
+      const isRateLimitErr =
+        error?.status === 429 ||
+        errStr.includes('429') ||
+        errStr.includes('too many requests') ||
+        errStr.includes('quota') ||
+        errStr.includes('resource_exhausted') ||
+        errStr.includes('rate limit');
+
+      if (isRateLimitErr) {
+        setIsRateLimited(true);
+        setErrorMessage("Rate limit reached. The AI service is receiving too many requests. Please try again later.");
+        toast.error("Rate limit reached. Please try again later.", {
+          description: "API quota limit has been exceeded temporarily."
+        });
+      } else {
+        setErrorMessage(error?.message || "Failed to get answer. Please try again.");
+        toast.error("Failed to get answer", {
+          description: "An unexpected error occurred while analyzing the code."
+        });
+      }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleRetry = () => {
+    if (currentPrompt) {
+      setQuestion(currentPrompt);
+      const fakeEvent = { preventDefault: () => {} } as React.FormEvent<HTMLFormElement>;
+      onSubmit(fakeEvent);
     }
   };
 
@@ -83,7 +123,7 @@ const AskQuestionCard = () => {
                 variant="outline"
                 size="sm"
                 onClick={handleSave}
-                disabled={loading || !answer || saved || saveAnswer.isPending}
+                disabled={loading || !answer || saved || saveAnswer.isPending || isRateLimited}
                 className="h-8 px-3 rounded-lg border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 text-xs font-semibold text-gray-700 dark:text-gray-200 flex items-center gap-1.5 shadow-2xs transition-colors"
               >
                 <BookmarkPlus className="size-3.5 text-indigo-600 dark:text-indigo-400" />
@@ -106,21 +146,65 @@ const AskQuestionCard = () => {
               </h3>
             )}
 
-            <div className="text-gray-800 dark:text-gray-200 text-sm md:text-base leading-relaxed whitespace-pre-wrap font-normal">
-              {answer ? (
-                answer
-              ) : loading ? (
-                <div className="space-y-3 animate-pulse py-2">
-                  <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded-md w-3/4"></div>
-                  <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded-md w-full"></div>
-                  <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded-md w-5/6"></div>
+            {isRateLimited || (answer && answer.toLowerCase().includes('rate limit reached')) ? (
+              <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 flex items-start gap-3 text-amber-900 dark:text-amber-200 shadow-2xs">
+                <div className="size-8 rounded-lg bg-amber-100 dark:bg-amber-900/60 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
+                  <AlertTriangle className="size-4.5" />
                 </div>
-              ) : (
-                <p className="text-gray-500 dark:text-gray-400 text-sm italic">
-                  No answer generated. Please try again.
-                </p>
-              )}
-            </div>
+                <div className="space-y-1">
+                  <h4 className="text-sm font-bold text-amber-950 dark:text-amber-100">
+                    Rate Limit Reached
+                  </h4>
+                  <p className="text-xs text-amber-800 dark:text-amber-300 leading-relaxed">
+                    The Gemini AI request quota has been temporarily reached or too many requests were received. Please wait a moment and try again.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleRetry}
+                    disabled={loading}
+                    className="mt-2 text-xs font-semibold text-amber-900 dark:text-amber-200 hover:text-amber-700 dark:hover:text-amber-100 flex items-center gap-1.5 cursor-pointer underline"
+                  >
+                    <RefreshCw className="size-3" />
+                    <span>Retry Question</span>
+                  </button>
+                </div>
+              </div>
+            ) : errorMessage ? (
+              <div className="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 flex items-start gap-3 text-rose-900 dark:text-rose-200 shadow-2xs">
+                <div className="size-8 rounded-lg bg-rose-100 dark:bg-rose-900/60 flex items-center justify-center text-rose-600 dark:text-rose-400 shrink-0">
+                  <AlertTriangle className="size-4.5" />
+                </div>
+                <div className="space-y-1">
+                  <h4 className="text-sm font-bold text-rose-950 dark:text-rose-100">
+                    Error Generating Answer
+                  </h4>
+                  <p className="text-xs text-rose-800 dark:text-rose-300 leading-relaxed">
+                    {errorMessage}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleRetry}
+                    disabled={loading}
+                    className="mt-2 text-xs font-semibold text-rose-900 dark:text-rose-200 hover:text-rose-700 dark:hover:text-rose-100 flex items-center gap-1.5 cursor-pointer underline"
+                  >
+                    <RefreshCw className="size-3" />
+                    <span>Retry Question</span>
+                  </button>
+                </div>
+              </div>
+            ) : answer ? (
+              <MarkdownRenderer content={answer} />
+            ) : loading ? (
+              <div className="space-y-3 animate-pulse py-2">
+                <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded-md w-3/4"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded-md w-full"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded-md w-5/6"></div>
+              </div>
+            ) : (
+              <p className="text-gray-500 dark:text-gray-400 text-sm italic">
+                No answer generated. Please try again.
+              </p>
+            )}
           </div>
 
           {/* Source Context Tabs & Code Viewer matching Image 3 */}

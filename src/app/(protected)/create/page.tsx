@@ -43,18 +43,14 @@ const CreatePage = () => {
     }
 
     return (
-        <div className="bg-white rounded-2xl border border-gray-200 p-8 md:p-12 shadow-2xs min-h-[calc(100vh-120px)] flex items-center justify-center">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-8 md:p-12 shadow-2xs min-h-[calc(100vh-120px)] flex items-center justify-center transition-colors">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center max-w-5xl w-full">
                 
-                {/* Left Side: END TO END + Illustration matching Image 2 */}
+                {/* Left Side: Illustration Graphic */}
                 <div className="lg:col-span-5 flex flex-col items-center lg:items-start text-center lg:text-left space-y-6">
-                    <h1 className="text-4xl sm:text-5xl font-black text-blue-500 tracking-wider uppercase">
-                        END TO END
-                    </h1>
-
                     {/* Developer Coding Vector Graphic */}
                     <div className="relative size-64 sm:size-72 flex items-center justify-center">
-                        <div className="absolute inset-0 bg-blue-50 rounded-full blur-2xl opacity-60" />
+                        <div className="absolute inset-0 bg-blue-50 dark:bg-blue-950/30 rounded-full blur-2xl opacity-60" />
                         <svg className="size-full relative z-10" viewBox="0 0 400 320" fill="none" xmlns="http://www.w3.org/2000/svg">
                             {/* Background circle */}
                             <circle cx="160" cy="160" r="110" fill="#F1F5F9" />
@@ -93,7 +89,7 @@ const CreatePage = () => {
                     </div>
                 </div>
 
-                {/* Right Side: Link GitHub Form matching Image 2 */}
+                {/* Right Side: Link GitHub Form */}
                 <div className="lg:col-span-7 max-w-lg w-full mx-auto lg:mx-0 space-y-6">
                     <div>
                         <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">
@@ -111,7 +107,7 @@ const CreatePage = () => {
                             <Input
                                 {...register('projectName', { required: true })}
                                 placeholder="ChatPDF"
-                                className="pl-10.5 h-11 rounded-lg border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
+                                className="pl-10.5 h-11 rounded-lg border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 focus:border-rose-500 focus:ring-1 focus:ring-rose-500 text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
                                 required
                             />
                         </div>
@@ -125,7 +121,7 @@ const CreatePage = () => {
                                 {...register('repoUrl', { required: true })}
                                 placeholder="https://github.com/elliott-chong/chatpdf-yt"
                                 type="url"
-                                className="pl-10.5 h-11 rounded-lg border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
+                                className="pl-10.5 h-11 rounded-lg border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 focus:border-rose-500 focus:ring-1 focus:ring-rose-500 text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
                                 required
                             />
                         </div>
@@ -137,11 +133,11 @@ const CreatePage = () => {
                                 {...register('githubToken')}
                                 placeholder="GitHub Token (optional, for private repositories)"
                                 type="password"
-                                className="pl-10.5 h-11 rounded-lg border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
+                                className="pl-10.5 h-11 rounded-lg border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 focus:border-rose-500 focus:ring-1 focus:ring-rose-500 text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
                             />
                         </div>
 
-                        {/* Credit Charge Notice Box matching Image 2 */}
+                        {/* Credit Charge Notice Box */}
                         <div className="bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/60 rounded-lg p-3.5 flex items-start gap-2.5 text-xs text-amber-900 dark:text-amber-200 transition-colors">
                             <Info className="size-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
                             <div className="space-y-0.5">
@@ -149,16 +145,17 @@ const CreatePage = () => {
                                     You will be charged <span className="font-bold text-amber-950 dark:text-amber-100">46 credits</span> for this repository.
                                 </p>
                                 <p className="text-amber-700/90 dark:text-amber-300/80 font-normal">
-                                    You have <span className="font-semibold text-blue-700 dark:text-blue-400">150 credits</span> remaining.
+                                    You have <span className="font-semibold text-rose-700 dark:text-rose-400">150 credits</span> remaining.
                                 </p>
                             </div>
                         </div>
 
-                        {/* Submit Button matching Image 2 */}
+                        {/* Submit Button with Rose Gradient */}
                         <Button
                             type="submit"
+                            variant="rose"
                             disabled={createProject.isPending}
-                            className="w-auto h-10 px-6 rounded-lg premium-gradient-glow text-white font-medium text-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
+                            className="w-auto h-10 px-7 rounded-xl text-white font-semibold text-sm transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md active:scale-[0.98]"
                         >
                             {createProject.isPending ? (
                                 <>

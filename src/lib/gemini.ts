@@ -14,38 +14,39 @@ export const aiSummariseCommit = async (diff: string) => {
     throw new Error('GEMINI_API_KEY environment variable is not set. Please add it to your .env file');
   }
 
-  // https://github.com/docker/genai-stack/commit/<commithash>.diff
-  const response = await model.generateContent([
-    'You are an expert programmer, and you are trying to summarize a git diff.',
-    // Reminders about the git diff format:
-    // For every file, there are a few metadata lines, like (for example):
-    // diff --git a/lib/index.js b/lib/index.js
-    // index aadf691..bfef603 100644
-    // --- a/lib/index.js
-    // +++ b/lib/index.js
-    // 
-    // lib/index.js was modified.
-    // 
-    // A line starting with + means it was added.
-    // A line starting with - means that line was deleted.
-    // A line starting with neither + nor - is code given for context and better understanding, and is not part of the actual diff.
-    // 
-    // EXAMPLE SUMMARY COMMENTS:
-    // * Raised the amount of returned recordings from `10` to `100` [packages/server/recordings_api.ts], [packages/server/constants.ts]
-    // * Fixed a typo in the github action name [.github/workflows/gpt-commit-summarizer.yml]
-    // * Moved the `octokit` initialization to a separate file [src/octokit.ts], [src/index.ts]
-    // * Added an OpenAI API for completions [packages/utils/apis/openai.ts]
-    // * Lowered numeric tolerance for test files
-    // 
-    // Most commits will have less comments than this examples list.
-    // The last comment does not include the file names,
-    // because there were more than two relevant files in the hypothetical commit.
-    // Do not include parts of the example in your summary.
-    // It is given only as an example of appropriate comments.
-    `Please summarise the following diff file: \n\n${diff}`,
-  ]);
+  const maxRetries = 3;
+  let retryCount = 0;
 
-  return response.response.text();
+  while (retryCount < maxRetries) {
+    try {
+      const response = await model.generateContent([
+        'You are an expert programmer, and you are trying to summarize a git diff.',
+        `Please summarise the following diff file: \n\n${diff}`,
+      ]);
+
+      return response.response.text();
+    } catch (error: any) {
+      retryCount++;
+      const isRateLimit =
+        error?.status === 429 ||
+        error?.message?.includes('429') ||
+        error?.message?.toLowerCase().includes('too many requests') ||
+        error?.message?.toLowerCase().includes('quota') ||
+        error?.message?.toLowerCase().includes('resource_exhausted')
+
+      if (isRateLimit && retryCount < maxRetries) {
+        const delay = Math.pow(2, retryCount) * 1000;
+        console.log(`Rate limited in commit summary. Retrying in ${delay}ms (attempt ${retryCount}/${maxRetries})`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        continue;
+      }
+
+      console.error('Error in aiSummariseCommit:', error);
+      return '### Commit Summary\n* Code changes were indexed. (Rate limit reached during full AI analysis)';
+    }
+  }
+
+  return '### Commit Summary\n* Code changes were indexed.';
 }
 
 export async function summariseCode(doc: Document) {

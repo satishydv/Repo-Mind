@@ -158,7 +158,7 @@ const CreatePage = () => {
                         <Button
                             type="submit"
                             disabled={createProject.isPending}
-                            className="w-auto h-10 px-6 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm transition-colors flex items-center justify-center gap-2 shadow-2xs cursor-pointer"
+                            className="w-auto h-10 px-6 rounded-lg premium-gradient-glow text-white font-medium text-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
                         >
                             {createProject.isPending ? (
                                 <>

@@ -7,7 +7,7 @@ export default function Page() {
     <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center p-4 sm:p-6 text-gray-900">
       {/* Brand Logo Header */}
       <Link href="/" className="flex items-center gap-2.5 mb-6 transition-opacity hover:opacity-80">
-        <div className="size-9 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-2xs">
+        <div className="size-9 rounded-xl premium-gradient-glow flex items-center justify-center text-white shrink-0">
           <GitBranch className="size-5" />
         </div>
         <span className="text-xl font-bold tracking-tight text-gray-900">RepoMind</span>
@@ -28,7 +28,7 @@ export default function Page() {
             dividerText: "text-xs text-gray-400 font-normal uppercase",
             formFieldLabel: "text-xs font-semibold text-gray-700 mb-1",
             formFieldInput: "rounded-lg border border-gray-200 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm h-10 transition-colors placeholder:text-gray-400",
-            formButtonPrimary: "rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm h-10 shadow-2xs transition-colors cursor-pointer mt-2",
+            formButtonPrimary: "rounded-lg premium-gradient-glow text-white font-medium text-sm h-10 transition-all cursor-pointer mt-2",
             footerActionLink: "text-blue-600 hover:text-blue-700 font-semibold text-xs",
             footerActionText: "text-xs text-gray-500",
             identityPreviewText: "text-sm text-gray-700 font-medium",

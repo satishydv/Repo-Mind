@@ -271,7 +271,7 @@ const SecurityPage = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2.5">
-            <div className="size-9 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-sm">
+            <div className="size-9 rounded-xl premium-gradient-glow flex items-center justify-center text-white shrink-0">
               <ShieldCheck className="size-5" />
             </div>
             <div>
@@ -300,7 +300,7 @@ const SecurityPage = () => {
           <Button
             onClick={handleRunScan}
             disabled={isScanning}
-            className="h-9 px-4 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium shadow-2xs gap-2 cursor-pointer transition-all"
+            className="h-9 px-4 rounded-lg premium-gradient-glow text-white text-xs font-medium gap-2 cursor-pointer transition-all"
           >
             <RefreshCw className={cn("size-3.5", isScanning && "animate-spin")} />
             <span>{isScanning ? "Scanning Codebase..." : "Run Security Scan"}</span>

@@ -28,7 +28,7 @@ const MeetingsPage = () => {
 
         <div className="pt-2">
           <Link href="/dashboard">
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-6 h-10 text-sm font-medium transition-colors shadow-2xs cursor-pointer">
+            <Button className="premium-gradient-glow text-white rounded-lg px-6 h-10 text-sm font-medium transition-all cursor-pointer">
               Back to Dashboard
             </Button>
           </Link>

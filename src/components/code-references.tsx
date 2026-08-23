@@ -46,7 +46,7 @@ export const CodeReferences: React.FC<CodeReferencesProps> = ({
               className={cn(
                 "px-3 py-1.5 text-xs font-medium rounded-t-lg transition-colors border-t border-x border-transparent flex items-center gap-1.5 shrink-0 cursor-pointer",
                 isActive
-                  ? "bg-blue-600 text-white border-blue-600 shadow-2xs"
+                  ? "premium-gradient-glow text-white"
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200 border-gray-200/60"
               )}
             >

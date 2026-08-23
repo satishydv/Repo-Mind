@@ -282,7 +282,7 @@ export function ModuleInspector({
                 type="submit"
                 size="sm"
                 disabled={!chatQuestion.trim() || askMutation.isPending}
-                className="h-9 px-3 bg-blue-600 hover:bg-blue-700 text-white gap-1 shrink-0"
+                className="h-9 px-3 premium-gradient-glow text-white gap-1 shrink-0 cursor-pointer transition-all"
               >
                 {askMutation.isPending ? (
                   <RefreshCw className="size-3.5 animate-spin" />

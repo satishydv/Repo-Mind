@@ -75,7 +75,7 @@ const AskQuestionCard = () => {
           {/* Top Bar matching Image 3 */}
           <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-4">
             <div className="flex items-center gap-3">
-              <div className="size-8 rounded-lg bg-blue-600 flex items-center justify-center text-white shrink-0">
+              <div className="size-8 rounded-lg premium-gradient-glow flex items-center justify-center text-white shrink-0">
                 <GitBranch className="size-4.5" />
               </div>
               <Button
@@ -86,7 +86,7 @@ const AskQuestionCard = () => {
                 disabled={loading || !answer || saved || saveAnswer.isPending}
                 className="h-8 px-3 rounded-lg border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 text-xs font-semibold text-gray-700 dark:text-gray-200 flex items-center gap-1.5 shadow-2xs transition-colors"
               >
-                <BookmarkPlus className="size-3.5 text-blue-600 dark:text-blue-400" />
+                <BookmarkPlus className="size-3.5 text-indigo-600 dark:text-indigo-400" />
                 <span>{saved ? "Saved" : saveAnswer.isPending ? "Saving..." : "Save Answer"}</span>
               </Button>
             </div>
@@ -133,7 +133,7 @@ const AskQuestionCard = () => {
             <Button
               type="button"
               onClick={() => setOpen(false)}
-              className="w-full h-10 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm transition-colors cursor-pointer"
+              className="w-full h-10 rounded-lg premium-gradient-glow text-white font-medium text-sm transition-all cursor-pointer"
             >
               Close
             </Button>
@@ -142,26 +142,33 @@ const AskQuestionCard = () => {
       </Modal>
 
       {/* Ask Question Card on Page matching Image 1 */}
-      <div className="border border-gray-200 dark:border-gray-800 rounded-xl p-6 bg-white dark:bg-gray-900 shadow-2xs transition-colors">
+      <div className="border border-sky-100 dark:border-sky-950/50 bg-sky-50/50 dark:bg-sky-950/20 rounded-xl p-6 shadow-2xs hover:border-sky-200 dark:hover:border-sky-800/60 transition-all flex flex-col justify-between">
         <div className="mb-4">
-          <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 tracking-tight">Ask a question</h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-            RepoMind has knowledge of the codebase
-          </p>
+          <div className="flex items-center gap-2.5 mb-1">
+            <div className="size-9 rounded-lg bg-sky-100/80 dark:bg-sky-950/80 text-sky-600 dark:text-sky-400 flex items-center justify-center border border-sky-200/60 dark:border-sky-800/60 shrink-0">
+              <Sparkles className="size-4.5" />
+            </div>
+            <div>
+              <h2 className="text-base font-bold text-gray-900 dark:text-gray-100 tracking-tight leading-tight">Ask a question</h2>
+              <p className="text-xs text-sky-600/80 dark:text-sky-400/80 font-medium">
+                RepoMind has knowledge of the codebase
+              </p>
+            </div>
+          </div>
         </div>
 
-        <form onSubmit={onSubmit} className="space-y-4">
+        <form onSubmit={onSubmit} className="space-y-3.5">
           <Textarea
             placeholder="Which file should I edit to change the home page?"
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
-            className="min-h-[110px] rounded-lg border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 resize-y transition-colors"
+            className="min-h-[105px] rounded-lg border-sky-200/70 dark:border-sky-900/50 bg-white/95 dark:bg-gray-950 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 resize-y shadow-2xs transition-colors"
           />
 
           <Button
             type="submit"
             disabled={loading || !question.trim()}
-            className="rounded-lg h-9 px-5 bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm transition-colors flex items-center gap-2 shadow-2xs cursor-pointer"
+            className="rounded-lg h-9 px-5 premium-gradient-glow text-white font-medium text-sm transition-all flex items-center gap-2 cursor-pointer"
           >
             {loading ? (
               <>

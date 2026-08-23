@@ -287,7 +287,7 @@ function ArchitectureCanvas() {
               className={cn(
                 'px-2.5 py-1 rounded-md text-[11px] font-semibold whitespace-nowrap transition-colors cursor-pointer',
                 selectedCategoryFilter === cat.id
-                  ? 'bg-blue-600 text-white shadow-2xs'
+                  ? 'premium-gradient-glow text-white'
                   : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
               )}
             >

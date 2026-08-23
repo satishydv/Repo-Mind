@@ -31,7 +31,7 @@ const QAPage = () => {
           Select an existing project from the sidebar or link a new repository to access Q&A.
         </p>
         <Link href="/create">
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg gap-2 text-sm font-medium">
+          <Button className="premium-gradient-glow text-white rounded-lg gap-2 text-sm font-medium">
             <Plus className="size-4" />
             Create Project
           </Button>

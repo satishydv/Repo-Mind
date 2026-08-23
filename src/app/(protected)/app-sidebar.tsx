@@ -106,7 +106,7 @@ export function AppSidebar() {
       <Sidebar collapsible="icon" className="border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-colors">
         <SidebarHeader className="p-4 border-b border-sidebar-border flex flex-row items-center justify-between">
           <Link href="/dashboard" className="flex items-center gap-2.5">
-            <div className="size-8 rounded-lg bg-blue-600 flex items-center justify-center text-white shadow-sm shrink-0">
+            <div className="size-8 rounded-lg premium-gradient-glow flex items-center justify-center text-white shrink-0">
               <GitBranch className="size-5" />
             </div>
             {open && (
@@ -134,9 +134,9 @@ export function AppSidebar() {
                         <Link
                           href={item.url}
                           className={cn(
-                            'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
+                            'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all',
                             isActive
-                              ? 'bg-blue-600 text-white shadow-sm hover:bg-blue-700 hover:text-white'
+                              ? 'premium-gradient-glow text-white'
                               : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
                           )}
                         >
@@ -170,16 +170,16 @@ export function AppSidebar() {
                           className={cn(
                             "flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-colors group",
                             isSelected
-                              ? "bg-blue-50 dark:bg-blue-950/60 text-blue-900 dark:text-blue-300 font-semibold"
+                              ? "bg-indigo-50 dark:bg-indigo-950/60 text-indigo-900 dark:text-indigo-300 font-semibold"
                               : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                           )}
                         >
                           <div
                             className={cn(
-                              "size-6 rounded-md flex items-center justify-center text-xs font-bold shrink-0 transition-colors",
+                              "size-6 rounded-md flex items-center justify-center text-xs font-bold shrink-0 transition-all",
                               isSelected
-                                ? "bg-blue-600 text-white"
-                                : "border border-blue-500 text-blue-600 dark:text-blue-400 bg-white dark:bg-gray-800"
+                                ? "premium-gradient-glow text-white"
+                                : "border border-indigo-400 text-indigo-600 dark:text-indigo-400 bg-white dark:bg-gray-800"
                             )}
                           >
                             {firstChar}

@@ -12,7 +12,17 @@ import {
   SidebarMenuItem,
   SidebarTrigger,
 } from '@/components/ui/sidebar'
-import { LayoutDashboard, MessageSquareCode, Presentation, CreditCard, Plus, Trash2, GitBranch } from "lucide-react"
+import {
+  LayoutDashboard,
+  MessageSquareCode,
+  Presentation,
+  CreditCard,
+  Plus,
+  Trash2,
+  GitBranch,
+  ShieldAlert,
+  Network
+} from "lucide-react"
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
@@ -27,6 +37,16 @@ const navItems = [
     title: "Dashboard",
     url: "/dashboard",
     icon: LayoutDashboard,
+  },
+  {
+    title: "Security Auditor",
+    url: "/security",
+    icon: ShieldAlert,
+  },
+  {
+    title: "Architecture Graph",
+    url: "/architecture",
+    icon: Network,
   },
   {
     title: "Q&A",

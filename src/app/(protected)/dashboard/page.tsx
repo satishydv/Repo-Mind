@@ -33,6 +33,16 @@ const DashboardPage = () => {
     { enabled: !!project?.id }
   )
 
+  const { data: securityReport } = api.security.getAudit.useQuery(
+    { projectId: project?.id || '' },
+    { enabled: !!project?.id }
+  )
+
+  const { data: archData } = api.architecture.getGraphData.useQuery(
+    { projectId: project?.id || '', direction: 'LR' },
+    { enabled: !!project?.id }
+  )
+
   if (!project) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[50vh] text-center bg-white rounded-2xl border border-gray-200 p-8">
@@ -104,6 +114,101 @@ const DashboardPage = () => {
           >
             Archive
           </Button>
+        </div>
+      </div>
+
+      {/* Row of 2 Feature Highlight Cards: Security Auditor & Architecture Graph */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Security Health Card */}
+        <div className="border border-gray-200 dark:border-gray-800 rounded-xl p-5 bg-white dark:bg-gray-900 shadow-2xs flex flex-col justify-between transition-colors">
+          <div className="flex items-start justify-between gap-3 mb-3">
+            <div className="flex items-center gap-2.5">
+              <div className="size-9 rounded-lg bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center">
+                <svg className="size-5 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100">Security & Secret Auditor</h3>
+                <p className="text-xs text-gray-400 dark:text-gray-500">
+                  {securityReport ? `${securityReport.totalFindings} findings detected` : "Real-time codebase security"}
+                </p>
+              </div>
+            </div>
+
+            {securityReport && (
+              <div className="px-2.5 py-1 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 text-right">
+                <div className="text-xs font-bold text-gray-900 dark:text-gray-100">
+                  {securityReport.healthScore}/100
+                </div>
+                <div className="text-[10px] font-semibold text-blue-600 dark:text-blue-400">
+                  Grade {securityReport.grade}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <p className="text-xs text-gray-500 dark:text-gray-400 mb-4 line-clamp-2">
+            Scan repository source files for accidental credential leaks, SQL injection vulnerabilities, and anti-patterns.
+          </p>
+
+          <Link href="/security" className="block w-full">
+            <Button
+              variant="outline"
+              className="w-full h-8 text-xs font-medium text-blue-600 dark:text-blue-400 border-blue-100 dark:border-blue-900/60 bg-blue-50/40 dark:bg-blue-950/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 rounded-lg justify-between"
+            >
+              <span>Open Security Auditor</span>
+              <ArrowRight className="size-3.5" />
+            </Button>
+          </Link>
+        </div>
+
+        {/* Architecture Graph Card */}
+        <div className="border border-gray-200 dark:border-gray-800 rounded-xl p-5 bg-white dark:bg-gray-900 shadow-2xs flex flex-col justify-between transition-colors">
+          <div className="flex items-start justify-between gap-3 mb-3">
+            <div className="flex items-center gap-2.5">
+              <div className="size-9 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+                <svg className="size-5 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
+                  <circle cx="18" cy="5" r="3" />
+                  <circle cx="6" cy="12" r="3" />
+                  <circle cx="18" cy="19" r="3" />
+                  <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                  <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100">Dependency & Architecture Graph</h3>
+                <p className="text-xs text-gray-400 dark:text-gray-500">
+                  {archData ? `${archData.nodes.length} modules • ${archData.edges.length} connections` : "Interactive React Flow map"}
+                </p>
+              </div>
+            </div>
+
+            {archData && (
+              <div className="px-2.5 py-1 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 text-right">
+                <div className="text-xs font-bold text-gray-900 dark:text-gray-100">
+                  {archData.nodes.length} Files
+                </div>
+                <div className="text-[10px] font-semibold text-indigo-600 dark:text-indigo-400">
+                  Depth {archData.stats.maxDepth}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <p className="text-xs text-gray-500 dark:text-gray-400 mb-4 line-clamp-2">
+            Explore interactive node graph showing module dependencies, API routes, and click-to-explain AI summaries.
+          </p>
+
+          <Link href="/architecture" className="block w-full">
+            <Button
+              variant="outline"
+              className="w-full h-8 text-xs font-medium text-indigo-600 dark:text-indigo-400 border-indigo-100 dark:border-indigo-900/60 bg-indigo-50/40 dark:bg-indigo-950/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 rounded-lg justify-between"
+            >
+              <span>Explore Architecture Graph</span>
+              <ArrowRight className="size-3.5" />
+            </Button>
+          </Link>
         </div>
       </div>
 

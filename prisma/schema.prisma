@@ -40,6 +40,7 @@ model Project {
     commits       Commit[]
     sourceCodeEmbeddings SourceCodeEmbedding[]
     questions     Question[]
+    securityAudits SecurityAudit[]
 
     // Many-to-many relationship with User through UserToProject
     userToProjects UserToProject[]
@@ -100,4 +101,19 @@ model Question {
     userId          String
     user            User     @relation(fields: [userId], references: [id])
 }
+
+model SecurityAudit {
+    id          String   @id @default(cuid())
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    healthScore Int      @default(100)
+    grade       String   @default("A+")
+    findings    Json     @default("[]")
+    summary     Json     @default("{}")
+
+    projectId   String
+    project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
 

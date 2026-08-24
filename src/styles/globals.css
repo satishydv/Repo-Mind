@@ -299,4 +299,22 @@
   .amber-gradient-glow:active {
     transform: scale(0.96);
   }
+
+  .amber-light-gradient-glow {
+    text-shadow: 0 1px 1.5px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 3px 12px -1px rgba(245, 158, 11, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+    color: #fff !important;
+    background: linear-gradient(90deg, #fcd34d, #b45309) !important;
+    border: 1px solid rgba(252, 211, 77, 0.5) !important;
+  }
+
+  .amber-light-gradient-glow:hover {
+    filter: brightness(1.06);
+    box-shadow: 0 5px 16px 0 rgba(245, 158, 11, 0.28), inset 0 1px 1px rgba(255, 255, 255, 0.5);
+  }
+
+  .amber-light-gradient-glow:active {
+    transform: scale(0.96);
+  }
 }

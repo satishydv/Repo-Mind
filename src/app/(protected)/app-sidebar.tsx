@@ -212,8 +212,8 @@ export function AppSidebar() {
                 <div className="pt-2">
                   <Link href="/create">
                     <Button
-                      variant="outline"
-                      className="w-full flex items-center justify-center gap-2 h-9 rounded-lg border-sidebar-border bg-sidebar hover:bg-sidebar-accent text-sidebar-foreground text-xs font-medium shadow-2xs transition-colors cursor-pointer"
+                      variant="amber-light"
+                      className="w-full flex items-center justify-center gap-2 h-9 rounded-lg text-xs font-semibold shadow-xs transition-all cursor-pointer active:scale-[0.98]"
                     >
                       <Plus className="size-3.5" />
                       {open && <span>Create Project</span>}

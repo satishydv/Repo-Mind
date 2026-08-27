@@ -6,6 +6,10 @@ import { Search } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { ThemeToggle } from '@/components/theme-toggle'
 
+// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
+// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
+export const instant = false;
+
 type Props = {
     children: React.ReactNode
 }
@@ -47,4 +51,4 @@ const SidebarLayout = ({ children }: Props) => {
     )
 }
 
-export default SidebarLayout
+export default SidebarLayout

@@ -1,6 +1,7 @@
 import { pollCommits } from "@/lib/github";
 import { indexGithubRepo } from "@/lib/github-loader";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
+import { assertProjectAccess } from "@/server/api/project-access";
 import { z } from "zod";
 
 export const projectRouter = createTRPCRouter({
@@ -54,11 +55,13 @@ export const projectRouter = createTRPCRouter({
             projectId: z.string(),
         })
     ).query(async ({ ctx, input }) => {
+        await assertProjectAccess(ctx.db, ctx.user.userId!, input.projectId);
         // check for new commits from github
         pollCommits(input.projectId).then().catch(console.error);
         return await ctx.db.commit.findMany({ where: { projectId: input.projectId }, })
     }),
     archiveProject: protectedProcedure.input(z.object({ projectId: z.string() })).mutation(async ({ ctx, input }) => {
+        await assertProjectAccess(ctx.db, ctx.user.userId!, input.projectId);
         return await ctx.db.project.update({
             where: { id: input.projectId },
             data: { deletedAt: new Date() }
@@ -72,6 +75,7 @@ export const projectRouter = createTRPCRouter({
             filesReferences: z.any().optional(),
         })
     ).mutation(async ({ ctx, input }) => {
+        await assertProjectAccess(ctx.db, ctx.user.userId!, input.projectId);
         const userExists = await ctx.db.user.findUnique({
             where: { id: ctx.user.userId! }
         });
@@ -100,6 +104,7 @@ export const projectRouter = createTRPCRouter({
         })
     ).query(async ({ ctx, input }) => {
         if (!input.projectId) return [];
+        await assertProjectAccess(ctx.db, ctx.user.userId!, input.projectId);
         return await ctx.db.question.findMany({
             where: {
                 projectId: input.projectId,

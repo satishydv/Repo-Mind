@@ -3,11 +3,19 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { generateEmbedding } from '@/lib/gemini'
 import { db } from '@/server/db'
+import { auth } from '@clerk/nextjs/server'
+import { assertProjectAccess } from '@/server/api/project-access'
 import { createStreamableValue } from 'ai/rsc'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
 
 export async function askQuestion(question: string, projectId: string) {
+  const { userId } = await auth()
+  if (!userId) {
+    throw new Error('Unauthorized')
+  }
+  await assertProjectAccess(db, userId, projectId)
+
   console.log('🤖 Starting askQuestion for project:', projectId)
   const start = Date.now()
 
@@ -75,6 +83,11 @@ export async function askQuestion(question: string, projectId: string) {
           AI assistant will not apologize for previous responses, but instead will indicated new information was gained.
           AI assistant will not invent anything that is not drawn directly from the context.
           Answer in markdown syntax, with code snippets if needed. Be as detailed as possible when answering, make sure there is no ambiguity.
+
+          At the very end of your response, you MUST provide 3 follow-up questions the user could ask to learn more about the code you just explained.
+          Format the questions EXACTLY like this (including the delimiter):
+          ---FOLLOWUP---
+          ["Question 1?", "Question 2?", "Question 3?"]
         `
 
         const response = await model.generateContentStream(prompt)

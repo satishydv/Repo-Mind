@@ -1,4 +1,5 @@
 import { createTRPCRouter, protectedProcedure } from '@/server/api/trpc'
+import { assertProjectAccess } from '@/server/api/project-access'
 import { z } from 'zod'
 import {
   buildArchitectureGraph,
@@ -20,6 +21,9 @@ export const architectureRouter = createTRPCRouter({
       })
     )
     .query(async ({ ctx, input }): Promise<ArchitectureGraphData> => {
+      if (input.projectId) {
+        await assertProjectAccess(ctx.db, ctx.user.userId!, input.projectId)
+      }
       if (!input.projectId) {
         return {
           nodes: [],
@@ -66,6 +70,7 @@ export const architectureRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      await assertProjectAccess(ctx.db, ctx.user.userId!, input.projectId)
       const fileRecord = await ctx.db.sourceCodeEmbedding.findFirst({
         where: {
           projectId: input.projectId,
@@ -89,6 +94,7 @@ export const architectureRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      await assertProjectAccess(ctx.db, ctx.user.userId!, input.projectId)
       const fileRecord = await ctx.db.sourceCodeEmbedding.findFirst({
         where: {
           projectId: input.projectId,

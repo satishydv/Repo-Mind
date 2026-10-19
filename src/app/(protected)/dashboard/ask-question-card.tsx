@@ -34,9 +34,10 @@ const AskQuestionCard = () => {
     }
   });
 
-  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!project?.id || !question.trim()) return;
+  const onSubmit = async (e?: React.FormEvent<HTMLFormElement>, overrideQuestion?: string) => {
+    e?.preventDefault?.();
+    const q = overrideQuestion || question;
+    if (!project?.id || !q.trim()) return;
     setLoading(true);
     setOpen(true);
     setAnswer('');
@@ -44,8 +45,9 @@ const AskQuestionCard = () => {
     setIsRateLimited(false);
     setFilesReferences([]);
     setSaved(false);
-    const submittedQuestion = question;
+    const submittedQuestion = q;
     setCurrentPrompt(submittedQuestion);
+    setQuestion(submittedQuestion); // Ensure input updates
 
     try {
       const { output, filesReferences } = await askQuestion(submittedQuestion, project.id);
@@ -90,11 +92,21 @@ const AskQuestionCard = () => {
     }
   };
 
+  React.useEffect(() => {
+    const handleAskExternal = (e: Event) => {
+      const customEvent = e as CustomEvent<string>;
+      if (customEvent.detail) {
+        setQuestion(customEvent.detail);
+        onSubmit(undefined, customEvent.detail);
+      }
+    };
+    window.addEventListener('ask-question', handleAskExternal);
+    return () => window.removeEventListener('ask-question', handleAskExternal);
+  }, [project?.id]);
+
   const handleRetry = () => {
     if (currentPrompt) {
-      setQuestion(currentPrompt);
-      const fakeEvent = { preventDefault: () => {} } as React.FormEvent<HTMLFormElement>;
-      onSubmit(fakeEvent);
+      onSubmit(undefined, currentPrompt);
     }
   };
 
@@ -193,7 +205,40 @@ const AskQuestionCard = () => {
                 </div>
               </div>
             ) : answer ? (
-              <MarkdownRenderer content={answer} />
+              <>
+                <MarkdownRenderer content={answer.split('---FOLLOWUP---')[0]} />
+                {(() => {
+                  const parts = answer.split('---FOLLOWUP---');
+                  if (parts.length > 1) {
+                    try {
+                      const questions = JSON.parse(parts[1].trim());
+                      if (Array.isArray(questions)) {
+                        return (
+                          <div className="flex flex-wrap gap-2 mt-6 pt-4 border-t border-gray-100 dark:border-gray-800">
+                            <span className="w-full text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1 flex items-center gap-1.5">
+                              <Sparkles className="size-3.5 text-blue-500" />
+                              Suggested follow-ups
+                            </span>
+                            {questions.map((q, idx) => (
+                              <button
+                                key={idx}
+                                type="button"
+                                onClick={() => onSubmit(undefined, q)}
+                                className="text-left px-3 py-1.5 text-xs font-medium bg-blue-50/50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-full hover:bg-blue-100 dark:hover:bg-blue-900/40 border border-blue-200/50 dark:border-blue-800/50 transition-colors shadow-2xs cursor-pointer"
+                              >
+                                {q}
+                              </button>
+                            ))}
+                          </div>
+                        );
+                      }
+                    } catch (e) {
+                      // Silently fail while streaming
+                    }
+                  }
+                  return null;
+                })()}
+              </>
             ) : loading ? (
               <div className="space-y-3 animate-pulse py-2">
                 <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded-md w-3/4"></div>

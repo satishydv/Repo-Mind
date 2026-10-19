@@ -1,4 +1,5 @@
 import { createTRPCRouter, protectedProcedure } from '@/server/api/trpc'
+import { assertProjectAccess } from '@/server/api/project-access'
 import { z } from 'zod'
 import { scanCodebase, generateAIFix, type SecurityAuditReport, type SecurityFinding, type FindingStatus } from '@/lib/security-auditor'
 
@@ -9,6 +10,9 @@ export const securityRouter = createTRPCRouter({
   getAudit: protectedProcedure
     .input(z.object({ projectId: z.string() }))
     .query(async ({ ctx, input }): Promise<SecurityAuditReport> => {
+      if (input.projectId) {
+        await assertProjectAccess(ctx.db, ctx.user.userId!, input.projectId)
+      }
       if (!input.projectId) {
         return {
           healthScore: 100,
@@ -85,6 +89,7 @@ export const securityRouter = createTRPCRouter({
   runAudit: protectedProcedure
     .input(z.object({ projectId: z.string() }))
     .mutation(async ({ ctx, input }): Promise<SecurityAuditReport> => {
+      await assertProjectAccess(ctx.db, ctx.user.userId!, input.projectId)
       const files = await ctx.db.sourceCodeEmbedding.findMany({
         where: { projectId: input.projectId },
         select: { fileName: true, sourceCode: true },
@@ -127,6 +132,7 @@ export const securityRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      await assertProjectAccess(ctx.db, ctx.user.userId!, input.projectId)
       const fileRecord = await ctx.db.sourceCodeEmbedding.findFirst({
         where: {
           projectId: input.projectId,
@@ -150,6 +156,7 @@ export const securityRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      await assertProjectAccess(ctx.db, ctx.user.userId!, input.projectId)
       try {
         if ((ctx.db as any).securityAudit?.findFirst) {
           const latestAudit = await (ctx.db as any).securityAudit.findFirst({

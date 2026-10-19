@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button'
 import React, { useState } from 'react'
 import useProject from '@/hooks/use-project'
-import { ExternalLink, Presentation, Upload, Plus, GitBranch, MessageSquareCode, ArrowRight, Archive } from 'lucide-react'
+import { ExternalLink, Presentation, Upload, Plus, GitBranch, MessageSquareCode, ArrowRight, Archive, RefreshCw } from 'lucide-react'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,6 +14,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
 import Link from 'next/link'
 import Commit from './commit'
 import AskQuestionCard from '@/app/(protected)/dashboard/ask-question-card'
@@ -27,6 +36,8 @@ const DashboardPage = () => {
   const [selectedQuestion, setSelectedQuestion] = useState<QuestionData | null>(null)
   const [sheetOpen, setSheetOpen] = useState(false)
   const [archiveDialogOpen, setArchiveDialogOpen] = useState(false)
+  const [syncDialogOpen, setSyncDialogOpen] = useState(false)
+  const [githubToken, setGithubToken] = useState('')
 
   const ctx = api.useUtils()
   const archiveProject = api.project.archiveProject.useMutation({
@@ -38,6 +49,35 @@ const DashboardPage = () => {
     onError: () => {
       toast.error("Failed to archive project")
     }
+  })
+  const syncProject = api.project.syncProject.useMutation({
+    onSuccess: (result) => {
+      const changedFiles = result.addedFiles + result.updatedFiles + result.deletedFiles
+      if (result.noChanges) {
+        toast.info('Repository is already up to date.')
+      } else {
+        const previewFiles = result.changedFiles.slice(0, 3)
+        const filePreview = previewFiles
+          .map((file) => `${file.change}: ${file.fileName}`)
+          .join(', ')
+        const moreFiles = changedFiles > previewFiles.length
+          ? `, and ${changedFiles - previewFiles.length} more`
+          : ''
+        toast.success(
+          `Synced ${changedFiles} files: ${result.addedFiles} added, ${result.updatedFiles} updated, ${result.deletedFiles} removed.${filePreview ? ` ${filePreview}${moreFiles}` : ''}`,
+        )
+      }
+      setGithubToken('')
+      setSyncDialogOpen(false)
+      void ctx.project.getProjects.invalidate()
+      void ctx.project.getCommits.invalidate({ projectId })
+      void ctx.architecture.getGraphData.invalidate({ projectId, direction: 'LR' })
+      void ctx.security.getAudit.invalidate({ projectId })
+    },
+    onError: (error) => {
+      toast.error(error.message || 'Failed to sync repository')
+      void ctx.project.getProjects.invalidate()
+    },
   })
 
   const { data: questions } = api.project.getQuestions.useQuery(
@@ -85,26 +125,52 @@ const DashboardPage = () => {
   }
 
   const hasSavedQuestions = questions && questions.length > 0
+  const syncStatusIsBusy =
+    (project.syncStatus === 'indexing' || project.syncStatus === 'syncing') &&
+    !!project.syncStartedAt &&
+    Date.now() - new Date(project.syncStartedAt).getTime() < 15 * 60 * 1000
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* Top Banner Matching Image 1 */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         {/* Linked Repository Pill */}
-        <Link
-          href={project.githubUrl}
-          target="_blank"
-          className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-lg premium-gradient-glow text-white text-sm font-medium transition-all w-fit max-w-full truncate"
-        >
-          <svg className="size-4 shrink-0 fill-current" viewBox="0 0 24 24">
-            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
-          </svg>
-          <span className="truncate">This project is linked to {project.githubUrl}</span>
-          <ExternalLink className="size-3.5 shrink-0 opacity-80" />
-        </Link>
+        <div className="space-y-1">
+          <Link
+            href={project.githubUrl}
+            target="_blank"
+            className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-lg premium-gradient-glow text-white text-sm font-medium transition-all w-fit max-w-full truncate"
+          >
+            <svg className="size-4 shrink-0 fill-current" viewBox="0 0 24 24">
+              <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+            </svg>
+            <span className="truncate">This project is linked to {project.githubUrl}</span>
+            <ExternalLink className="size-3.5 shrink-0 opacity-80" />
+          </Link>
+          <p className="px-1 text-xs text-gray-500 dark:text-gray-400">
+            {syncStatusIsBusy
+              ? project.syncStatus === 'indexing'
+                ? 'Initial repository indexing is in progress…'
+                : 'Repository sync is in progress…'
+              : project.syncStatus === 'failed'
+                ? 'The last indexing or sync attempt failed. You can retry the sync.'
+                : project.lastSyncedAt
+              ? `Last synced ${formatDistanceToNow(new Date(project.lastSyncedAt), { addSuffix: true })}`
+              : 'Repository has not completed an initial sync yet'}
+          </p>
+        </div>
 
         {/* Right Action Buttons */}
         <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            onClick={() => setSyncDialogOpen(true)}
+            disabled={syncProject.isPending || syncStatusIsBusy}
+            className="h-10 px-4 rounded-lg text-sm gap-2"
+          >
+            <RefreshCw className={`size-4 ${syncProject.isPending || syncStatusIsBusy ? 'animate-spin' : ''}`} />
+            {syncStatusIsBusy ? 'Syncing…' : 'Sync latest changes'}
+          </Button>
           <Button
             variant="rose"
             onClick={() => {
@@ -334,6 +400,58 @@ const DashboardPage = () => {
         open={sheetOpen}
         setOpen={setSheetOpen}
       />
+
+      <Dialog
+        open={syncDialogOpen}
+        onOpenChange={(open) => {
+          setSyncDialogOpen(open)
+          if (!open && !syncProject.isPending) setGithubToken('')
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Sync latest repository changes</DialogTitle>
+            <DialogDescription>
+              RepoMind will compare the current default branch with its indexed snapshot and update only changed files.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            <label htmlFor="sync-github-token" className="text-sm font-medium">
+              GitHub token <span className="text-muted-foreground">(optional for public repositories)</span>
+            </label>
+            <Input
+              id="sync-github-token"
+              type="password"
+              autoComplete="new-password"
+              value={githubToken}
+              onChange={(event) => setGithubToken(event.target.value)}
+              placeholder="ghp_…"
+              disabled={syncProject.isPending}
+            />
+            <p className="text-xs text-muted-foreground">
+              Needed for private repositories. The token is used for this sync only and is not saved.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setSyncDialogOpen(false)}
+              disabled={syncProject.isPending}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => syncProject.mutate({
+                projectId: project.id,
+                githubToken: githubToken.trim() || undefined,
+              })}
+              disabled={syncProject.isPending}
+            >
+              {syncProject.isPending ? 'Syncing…' : 'Sync repository'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Archive Confirmation Popup Dialog */}
       <AlertDialog

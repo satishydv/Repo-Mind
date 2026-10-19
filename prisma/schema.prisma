@@ -37,6 +37,10 @@ model Project {
     name      String
     githubUrl String
     deletedAt DateTime?
+    syncStatus String @default("ready")
+    syncStartedAt DateTime?
+    lastIndexedCommitSha String?
+    lastSyncedAt DateTime?
     commits       Commit[]
     sourceCodeEmbeddings SourceCodeEmbedding[]
     questions     Question[]

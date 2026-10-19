@@ -9,6 +9,50 @@ export const octokit = new Octokit({
     auth: process.env.GITHUB_TOKEN,
 });
 
+export function parseGithubRepositoryUrl(githubUrl: string) {
+  let parsedUrl: URL;
+  try {
+    parsedUrl = new URL(githubUrl);
+  } catch {
+    throw new Error("Enter a valid GitHub repository URL");
+  }
+
+  if (parsedUrl.protocol !== "https:" || parsedUrl.hostname !== "github.com") {
+    throw new Error("Only repositories hosted on github.com are supported");
+  }
+
+  const [owner, repository] = parsedUrl.pathname
+    .split("/")
+    .filter(Boolean);
+  const repo = repository?.replace(/\.git$/, "");
+
+  if (!owner || !repo) {
+    throw new Error("Enter a valid GitHub repository URL");
+  }
+
+  return { owner, repo };
+}
+
+export function createGithubClient(token?: string) {
+  return token ? new Octokit({ auth: token }) : octokit;
+}
+
+export async function getGithubRepoHead(githubUrl: string, token?: string) {
+  const { owner, repo } = parseGithubRepositoryUrl(githubUrl);
+  const client = createGithubClient(token);
+  const repository = await client.rest.repos.get({ owner, repo });
+  const branch = repository.data.default_branch;
+  const branchInfo = await client.rest.repos.getBranch({ owner, repo, branch });
+
+  return {
+    client,
+    owner,
+    repo,
+    branch,
+    headSha: branchInfo.data.commit.sha,
+  };
+}
+
 const githubUrl = 'https://github.com/kendrekaran/kendrekaran';
 
 // Type definition for commit data structure
@@ -37,11 +81,7 @@ export const getCommitHashes = async (
 ): Promise<Response[]> => {
   // https://github.com/docker/genai-stack
   // Remove .git suffix if present and extract owner/repo
-  const cleanUrl = githubUrl.replace(/\.git$/, '');
-  const [owner, repo] = cleanUrl.split('/').slice(-2);
-  if (!owner || !repo) {
-    throw new Error("Invalid github url");
-  }
+  const { owner, repo } = parseGithubRepositoryUrl(githubUrl);
   const { data } = await octokit.rest.repos.listCommits({ owner, repo });
   const sortedCommits = data.sort((a: any, b: any) => new Date(b.commit.author.date).getTime() - new Date(a.commit.author.date).getTime());
 

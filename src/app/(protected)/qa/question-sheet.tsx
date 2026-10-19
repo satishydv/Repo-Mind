@@ -92,12 +92,13 @@ export const QuestionSheet: React.FC<QuestionSheetProps> = ({
                   <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
                     {/* Answer Text */}
                     <>
-                      <MarkdownRenderer content={question.answer.split('---FOLLOWUP---')[0]} />
+                      <MarkdownRenderer content={question.answer.split('---FOLLOWUP---')[0] ?? question.answer} />
                       {(() => {
                         const parts = question.answer.split('---FOLLOWUP---');
-                        if (parts.length > 1) {
+                        const followUpJson = parts[1];
+                        if (followUpJson) {
                           try {
-                            const questions = JSON.parse(parts[1].trim());
+                            const questions = JSON.parse(followUpJson.trim());
                             if (Array.isArray(questions)) {
                               return (
                                 <div className="flex flex-wrap gap-2 mt-6 pt-4 border-t border-gray-100 dark:border-gray-800">

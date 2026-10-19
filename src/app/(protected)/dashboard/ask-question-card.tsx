@@ -206,12 +206,13 @@ const AskQuestionCard = () => {
               </div>
             ) : answer ? (
               <>
-                <MarkdownRenderer content={answer.split('---FOLLOWUP---')[0]} />
+                <MarkdownRenderer content={answer.split('---FOLLOWUP---')[0] ?? answer} />
                 {(() => {
                   const parts = answer.split('---FOLLOWUP---');
-                  if (parts.length > 1) {
+                  const followUpJson = parts[1];
+                  if (followUpJson) {
                     try {
-                      const questions = JSON.parse(parts[1].trim());
+                      const questions = JSON.parse(followUpJson.trim());
                       if (Array.isArray(questions)) {
                         return (
                           <div className="flex flex-wrap gap-2 mt-6 pt-4 border-t border-gray-100 dark:border-gray-800">

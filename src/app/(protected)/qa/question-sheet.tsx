@@ -2,7 +2,7 @@
 
 import React, { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import { X, FileCode2 } from "lucide-react";
+import { X, FileCode2, Sparkles } from "lucide-react";
 import { CodeReferences, type FileReference } from "@/components/code-references";
 import { MarkdownRenderer } from "@/components/markdown-renderer";
 
@@ -91,7 +91,43 @@ export const QuestionSheet: React.FC<QuestionSheetProps> = ({
                   {/* Scrollable Content Body */}
                   <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
                     {/* Answer Text */}
-                    <MarkdownRenderer content={question.answer} />
+                    <>
+                      <MarkdownRenderer content={question.answer.split('---FOLLOWUP---')[0]} />
+                      {(() => {
+                        const parts = question.answer.split('---FOLLOWUP---');
+                        if (parts.length > 1) {
+                          try {
+                            const questions = JSON.parse(parts[1].trim());
+                            if (Array.isArray(questions)) {
+                              return (
+                                <div className="flex flex-wrap gap-2 mt-6 pt-4 border-t border-gray-100 dark:border-gray-800">
+                                  <span className="w-full text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1 flex items-center gap-1.5">
+                                    <Sparkles className="size-3.5 text-blue-500" />
+                                    Suggested follow-ups
+                                  </span>
+                                  {questions.map((q, idx) => (
+                                    <button
+                                      key={idx}
+                                      type="button"
+                                      onClick={() => {
+                                        setOpen(false);
+                                        window.dispatchEvent(new CustomEvent('ask-question', { detail: q }));
+                                      }}
+                                      className="text-left px-3 py-1.5 text-xs font-medium bg-blue-50/50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-full hover:bg-blue-100 dark:hover:bg-blue-900/40 border border-blue-200/50 dark:border-blue-800/50 transition-colors shadow-2xs cursor-pointer"
+                                    >
+                                      {q}
+                                    </button>
+                                  ))}
+                                </div>
+                              );
+                            }
+                          } catch (e) {
+                            // Silently fail if JSON parsing fails
+                          }
+                        }
+                        return null;
+                      })()}
+                    </>
 
                     {/* Source Context Tabs & Code Viewer */}
                     {parsedFiles.length > 0 && (

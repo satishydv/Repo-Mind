@@ -2,11 +2,16 @@ import { GithubRepoLoader } from '@langchain/community/document_loaders/web/gith
 import { Document } from '@langchain/core/documents'
 import { summariseCode, generateEmbedding } from './gemini'
 import { db } from '../server/db'
+import { getGithubRepoHead } from './github'
 
-export const loadGithubRepo = async (githubUrl: string, githubToken?: string) => {
+export const loadGithubRepo = async (
+  githubUrl: string,
+  githubToken?: string,
+  branch = 'main',
+) => {
   const loader = new GithubRepoLoader(githubUrl, {
-    accessToken: githubToken || '',
-    branch: 'main',
+    accessToken: githubToken || process.env.GITHUB_TOKEN || undefined,
+    branch,
     ignoreFiles: ['package-lock.json', 'yarn.lock', 'pnpm-lock.yaml', 'bun.lockb'],
     recursive: true,
     unknown: 'warn',
@@ -21,52 +26,70 @@ export const indexGithubRepo = async (projectId: string, githubUrl: string, gith
   console.log('Starting indexGithubRepo for project:', projectId, 'URL:', githubUrl)
   
   try {
+    const { headSha } = await getGithubRepoHead(githubUrl, githubToken)
+
     // Test database connection
     console.log('Testing database connection...')
     await db.$queryRaw`SELECT 1`
     console.log('Database connection successful')
     
-    const docs = await loadGithubRepo(githubUrl, githubToken)
+    const docs = await loadGithubRepo(githubUrl, githubToken, headSha)
     console.log('Loaded', docs.length, 'documents from GitHub')
     
     const allEmbeddings = await generateEmbeddings(docs)
     console.log('Generated embeddings for', allEmbeddings.filter(Boolean).length, 'files')
+
+    if (allEmbeddings.length !== docs.length || allEmbeddings.some((embedding) => !embedding)) {
+      throw new Error('Some repository files could not be embedded. The project sync point was not advanced.')
+    }
     
-    await Promise.allSettled(allEmbeddings.map(async (embedding, index) => {
+    await Promise.all(allEmbeddings.map(async (embedding, index) => {
       console.log(`Processing ${index} of ${allEmbeddings.length}`)
-      if (!embedding) {
-        console.log('Skipping null embedding at index', index)
-        return
+      if (!embedding) return
+
+      const existing = await db.sourceCodeEmbedding.findFirst({
+        where: { projectId, fileName: embedding.fileName },
+        select: { id: true },
+      })
+      const data = {
+        summary: embedding.summary,
+        sourceCode: embedding.sourceCode,
+        fileName: embedding.fileName,
+        projectId,
       }
-      
-      try {
-        const sourceCodeEmbedding = await db.sourceCodeEmbedding.create({
-          data: {
-            summary: embedding.summary,
-            sourceCode: embedding.sourceCode,
-            fileName: embedding.fileName,
-            projectId,
-          }
-        })
-        
-        console.log('Created embedding record for:', embedding.fileName)
-        
-        await db.$executeRaw`
-          UPDATE "SourceCodeEmbedding"
-          SET "summaryEmbedding" = ${`[${embedding.embedding.join(',')}]`}::vector
-          WHERE "id"= ${sourceCodeEmbedding.id}
-        `
-        
-        console.log('Updated vector for:', embedding.fileName)
-      } catch (error) {
-        console.error('Error saving embedding for', embedding.fileName, ':', error)
-      }
+      const sourceCodeEmbedding = existing
+        ? await db.sourceCodeEmbedding.update({ where: { id: existing.id }, data })
+        : await db.sourceCodeEmbedding.create({ data })
+
+      await db.$executeRaw`
+        UPDATE "SourceCodeEmbedding"
+        SET "summaryEmbedding" = ${`[${embedding.embedding.join(',')}]`}::vector
+        WHERE "id"= ${sourceCodeEmbedding.id}
+      `
+
+      console.log('Saved embedding for:', embedding.fileName)
     }))
+
+    await db.project.update({
+      where: { id: projectId },
+      data: {
+        syncStatus: 'ready',
+        syncStartedAt: null,
+        lastIndexedCommitSha: headSha,
+        lastSyncedAt: new Date(),
+      },
+    })
     
     console.log('Finished indexing project:', projectId)
     return allEmbeddings
   } catch (error) {
     console.error('Error in indexGithubRepo:', error)
+    await db.project.updateMany({
+      where: { id: projectId },
+      data: { syncStatus: 'failed', syncStartedAt: null },
+    }).catch((updateError) => {
+      console.error('Could not record indexing failure:', updateError)
+    })
     throw error
   }
 }

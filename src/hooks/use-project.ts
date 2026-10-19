@@ -3,7 +3,12 @@ import { api } from '@/trpc/react'
 import { useLocalStorage } from 'usehooks-ts'
 
 const useProject = () => {
-    const { data: projects, isLoading } = api.project.getProjects.useQuery()
+    const { data: projects, isLoading } = api.project.getProjects.useQuery(undefined, {
+        refetchInterval: (query) =>
+            query.state.data?.some(project =>
+                project.syncStatus === 'indexing' || project.syncStatus === 'syncing'
+            ) ? 3000 : false,
+    })
     const [projectId, setProjectId] = useLocalStorage('projectId', '')
 
     useEffect(() => {

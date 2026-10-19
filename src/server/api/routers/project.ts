@@ -1,7 +1,9 @@
 import { pollCommits } from "@/lib/github";
 import { indexGithubRepo } from "@/lib/github-loader";
+import { syncGithubRepo } from "@/lib/github-sync";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { assertProjectAccess } from "@/server/api/project-access";
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 export const projectRouter = createTRPCRouter({
@@ -17,6 +19,8 @@ export const projectRouter = createTRPCRouter({
             data: {
                 name: input.name,
                 githubUrl: input.githubUrl,
+                syncStatus: "indexing",
+                syncStartedAt: new Date(),
                 userToProjects: {
                     create: {
                         userId: ctx.user.userId!,
@@ -48,6 +52,61 @@ export const projectRouter = createTRPCRouter({
                 deletedAt: null
             }
         });
+    }),
+    syncProject: protectedProcedure.input(
+        z.object({
+            projectId: z.string(),
+            githubToken: z.string().optional(),
+        })
+    ).mutation(async ({ ctx, input }) => {
+        await assertProjectAccess(ctx.db, ctx.user.userId!, input.projectId);
+        const staleSyncBefore = new Date(Date.now() - 15 * 60 * 1000);
+        const claimed = await ctx.db.project.updateMany({
+            where: {
+                id: input.projectId,
+                deletedAt: null,
+                userToProjects: { some: { userId: ctx.user.userId! } },
+                OR: [
+                    { syncStatus: { in: ["ready", "failed"] } },
+                    {
+                        syncStatus: { in: ["indexing", "syncing"] },
+                        syncStartedAt: { lt: staleSyncBefore },
+                    },
+                ],
+            },
+            data: {
+                syncStatus: "syncing",
+                syncStartedAt: new Date(),
+            },
+        });
+
+        if (claimed.count === 0) {
+            const project = await ctx.db.project.findUnique({
+                where: { id: input.projectId },
+                select: { syncStatus: true },
+            });
+            throw new TRPCError({
+                code: "CONFLICT",
+                message: project?.syncStatus === "indexing"
+                    ? "Initial repository indexing is still running. Try syncing again when it finishes."
+                    : "A repository sync is already running. Try again when it finishes.",
+            });
+        }
+
+        try {
+            const result = await syncGithubRepo(input.projectId, input.githubToken);
+            await ctx.db.project.update({
+                where: { id: input.projectId },
+                data: { syncStatus: "ready", syncStartedAt: null },
+            });
+            return result;
+        } catch (error) {
+            await ctx.db.project.update({
+                where: { id: input.projectId },
+                data: { syncStatus: "failed", syncStartedAt: null },
+            });
+            throw error;
+        }
     }),
     // get commits for a project from the database
     getCommits: protectedProcedure.input(
